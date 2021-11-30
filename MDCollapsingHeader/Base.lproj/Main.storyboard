@@ -17,47 +17,6 @@
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
-                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Xbg-3f-Oax">
-                                <rect key="frame" x="0.0" y="-160" width="414" height="300"/>
-                                <subviews>
-                                    <view contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Iqf-oh-A4i" userLabel="filterview-placeholder">
-                                        <rect key="frame" x="0.0" y="252" width="414" height="48"/>
-                                        <subviews>
-                                            <view contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" translatesAutoresizingMaskIntoConstraints="NO" id="EVG-Rb-Fuy" userLabel="pixel-perfect-bar">
-                                                <rect key="frame" x="0.0" y="46" width="414" height="2"/>
-                                                <color key="backgroundColor" systemColor="systemGreenColor"/>
-                                                <constraints>
-                                                    <constraint firstAttribute="height" constant="2" id="2q6-dS-svm"/>
-                                                </constraints>
-                                            </view>
-                                        </subviews>
-                                        <color key="backgroundColor" systemColor="systemPinkColor"/>
-                                        <constraints>
-                                            <constraint firstItem="EVG-Rb-Fuy" firstAttribute="leading" secondItem="Iqf-oh-A4i" secondAttribute="leading" id="Ehi-1R-0nV"/>
-                                            <constraint firstAttribute="bottom" secondItem="EVG-Rb-Fuy" secondAttribute="bottom" id="N82-GK-jgL"/>
-                                            <constraint firstAttribute="height" constant="48" id="aFM-Ee-0ea"/>
-                                            <constraint firstAttribute="trailing" secondItem="EVG-Rb-Fuy" secondAttribute="trailing" id="egP-QH-hl4"/>
-                                        </constraints>
-                                    </view>
-                                    <view contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Y4S-mc-pc0" userLabel="pixel-error-bar">
-                                        <rect key="frame" x="0.0" y="300" width="414" height="2"/>
-                                        <color key="backgroundColor" systemColor="systemYellowColor"/>
-                                        <constraints>
-                                            <constraint firstAttribute="height" constant="2" id="dOD-7A-DXl"/>
-                                        </constraints>
-                                    </view>
-                                </subviews>
-                                <color key="backgroundColor" systemColor="systemIndigoColor"/>
-                                <constraints>
-                                    <constraint firstItem="Y4S-mc-pc0" firstAttribute="top" secondItem="Iqf-oh-A4i" secondAttribute="bottom" id="4hQ-JM-MhR"/>
-                                    <constraint firstAttribute="height" constant="300" id="7Ao-rv-IfO"/>
-                                    <constraint firstAttribute="bottom" secondItem="Y4S-mc-pc0" secondAttribute="bottom" constant="-2" id="8Rh-cu-iQu"/>
-                                    <constraint firstAttribute="trailing" secondItem="Iqf-oh-A4i" secondAttribute="trailing" id="BYo-bH-cWY"/>
-                                    <constraint firstItem="Y4S-mc-pc0" firstAttribute="leading" secondItem="Xbg-3f-Oax" secondAttribute="leading" id="H9O-vt-t2Q"/>
-                                    <constraint firstItem="Iqf-oh-A4i" firstAttribute="leading" secondItem="Xbg-3f-Oax" secondAttribute="leading" id="I6u-wM-JgC"/>
-                                    <constraint firstAttribute="trailing" secondItem="Y4S-mc-pc0" secondAttribute="trailing" id="NNV-eK-B8h"/>
-                                </constraints>
-                            </view>
                             <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="44" sectionHeaderHeight="1" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="yFY-HN-j1T">
                                 <rect key="frame" x="0.0" y="140" width="414" height="722"/>
                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
@@ -66,11 +25,54 @@
                                     <outlet property="delegate" destination="v2F-px-vzg" id="w0H-cs-oGj"/>
                                 </connections>
                             </tableView>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Xbg-3f-Oax">
+                                <rect key="frame" x="0.0" y="-110" width="414" height="250"/>
+                                <subviews>
+                                    <view contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Iqf-oh-A4i" userLabel="filterview-placeholder">
+                                        <rect key="frame" x="0.0" y="202" width="414" height="48"/>
+                                        <subviews>
+                                            <view contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" translatesAutoresizingMaskIntoConstraints="NO" id="EVG-Rb-Fuy" userLabel="pixel-perfect-bar">
+                                                <rect key="frame" x="0.0" y="46" width="414" height="2"/>
+                                                <color key="backgroundColor" systemColor="systemGreenColor"/>
+                                                <constraints>
+                                                    <constraint firstAttribute="height" constant="2" id="2q6-dS-svm"/>
+                                                </constraints>
+                                            </view>
+                                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Ow3-SB-bZE">
+                                                <rect key="frame" x="137.5" y="8.5" width="139" height="31"/>
+                                                <state key="normal" title="Button"/>
+                                                <buttonConfiguration key="configuration" style="gray" title="Show Scoreboard">
+                                                    <color key="baseForegroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                </buttonConfiguration>
+                                                <connections>
+                                                    <action selector="headerButtonPressed:" destination="v2F-px-vzg" eventType="touchUpInside" id="jNq-Ss-ojo"/>
+                                                </connections>
+                                            </button>
+                                        </subviews>
+                                        <color key="backgroundColor" systemColor="systemPinkColor"/>
+                                        <constraints>
+                                            <constraint firstItem="EVG-Rb-Fuy" firstAttribute="leading" secondItem="Iqf-oh-A4i" secondAttribute="leading" id="Ehi-1R-0nV"/>
+                                            <constraint firstAttribute="bottom" secondItem="EVG-Rb-Fuy" secondAttribute="bottom" id="N82-GK-jgL"/>
+                                            <constraint firstItem="Ow3-SB-bZE" firstAttribute="centerX" secondItem="Iqf-oh-A4i" secondAttribute="centerX" id="R1D-cm-oxe"/>
+                                            <constraint firstAttribute="height" constant="48" id="aFM-Ee-0ea"/>
+                                            <constraint firstAttribute="trailing" secondItem="EVG-Rb-Fuy" secondAttribute="trailing" id="egP-QH-hl4"/>
+                                            <constraint firstItem="Ow3-SB-bZE" firstAttribute="centerY" secondItem="Iqf-oh-A4i" secondAttribute="centerY" id="ifb-Qw-Q8g"/>
+                                        </constraints>
+                                    </view>
+                                </subviews>
+                                <color key="backgroundColor" systemColor="systemIndigoColor"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="250" id="7Ao-rv-IfO"/>
+                                    <constraint firstAttribute="trailing" secondItem="Iqf-oh-A4i" secondAttribute="trailing" id="BYo-bH-cWY"/>
+                                    <constraint firstItem="Iqf-oh-A4i" firstAttribute="leading" secondItem="Xbg-3f-Oax" secondAttribute="leading" id="I6u-wM-JgC"/>
+                                    <constraint firstAttribute="bottom" secondItem="Iqf-oh-A4i" secondAttribute="bottom" id="Rsw-5e-rC2"/>
+                                </constraints>
+                            </view>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="Fc7-Ar-0yO"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
-                            <constraint firstItem="Xbg-3f-Oax" firstAttribute="top" secondItem="bjc-24-HlH" secondAttribute="top" constant="-160" id="0LZ-Ot-79t"/>
+                            <constraint firstItem="Xbg-3f-Oax" firstAttribute="top" secondItem="bjc-24-HlH" secondAttribute="top" constant="-110" id="0LZ-Ot-79t"/>
                             <constraint firstItem="yFY-HN-j1T" firstAttribute="trailing" secondItem="Fc7-Ar-0yO" secondAttribute="trailing" id="5kC-i6-pUF"/>
                             <constraint firstItem="Xbg-3f-Oax" firstAttribute="leading" secondItem="Fc7-Ar-0yO" secondAttribute="leading" id="GiF-qo-bEe"/>
                             <constraint firstItem="yFY-HN-j1T" firstAttribute="top" secondItem="bjc-24-HlH" secondAttribute="top" constant="140" id="IHb-mg-nIq"/>
@@ -104,9 +106,6 @@
         </systemColor>
         <systemColor name="systemPinkColor">
             <color red="1" green="0.17647058823529413" blue="0.33333333333333331" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-        </systemColor>
-        <systemColor name="systemYellowColor">
-            <color red="1" green="0.80000000000000004" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
     </resources>
 </document>

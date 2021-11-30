@@ -27,8 +27,13 @@ class ContainingViewController: UIViewController {
     /// The CGFloat value that controls the top elevator lift constraint of the HeaderView
     @IBOutlet weak var fullyExpandedHeightConstraint: NSLayoutConstraint!
     private(set) var fullyExpandedHeightVal: CGFloat = 0.0 {
-        didSet { fullyExpandedHeightConstraint.constant = fullyExpandedHeightVal }
+        didSet {
+            fullyExpandedHeightConstraint.constant = fullyExpandedHeightVal
+            expandedHeightDiff = fullyExpandedHeightVal - oldValue
+        }
     }
+    
+    private(set) var expandedHeightDiff: CGFloat = 0.0
     
     /// The CGFloat value that controls the top elevator lift constraint of the HeaderView
     private(set) var headerTopLiftVal: CGFloat = 0.0 {
@@ -40,7 +45,9 @@ class ContainingViewController: UIViewController {
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: "cell")
         
         updateHeaderHeights()
-        tableView.setContentOffset(.init(x: 0.0, y: 0.0), animated: false)
+        
+        // Use offset of `fullExpandedHeightVal` to fully expand Header on load. Use zero for a collapsed Header
+        tableView.setContentOffset(.init(x: 0.0, y: fullExpandScrollVal), animated: false)
     }
     
     func updateHeaderHeights(_ minHeight: CGFloat? = nil, _ maxHeight: CGFloat? = nil) {
@@ -52,11 +59,32 @@ class ContainingViewController: UIViewController {
             fullyExpandedHeightVal  = fullyExpandedHeightConstraint.constant
         }
         
-        // adjust the scroll view's top inset to account for scrolling the header offscreen
         tableView.contentInset = .init(top: fullyExpandedHeightVal, left: 0.0, bottom: 0.0, right: 0.0)
     }
     
-    private var maxScrollVal: CGFloat { fullyCollapsedHeightVal - fullyExpandedHeightVal }
+    private var fullExpandScrollVal: CGFloat { fullyCollapsedHeightVal - fullyExpandedHeightVal }
+    
+    @IBAction func headerButtonPressed(_ sender: UIButton) {
+        let shouldCollapse = fullyExpandedHeightVal > 300.0
+        fullyExpandedHeightVal = shouldCollapse ? 250.0 : 375.0
+        sender.setTitle("\(shouldCollapse ? "Show" : "Hide") Scoreboard", for: .normal)
+        
+        UIView.animate(withDuration: 0.35) { [self] in
+            if !shouldCollapse { tableView.contentOffset.y -= expandedHeightDiff }
+            updateTableAndHeader(tableView.contentOffset.y)
+            view.layoutIfNeeded()
+        }
+    }
+    
+    /// Makes changes to Header top contstraint and tableView contentInset to achieve collapsable Header effect
+    /// - Parameter yOffset: CGFloat offset value
+    private func updateTableAndHeader(_ yOffset: CGFloat) {
+        let newHeightVal: CGFloat = fullExpandScrollVal - yOffset
+        headerTopLiftVal = min(0.0, max(fullExpandScrollVal, newHeightVal))
+        
+        let insetTopVal: CGFloat = min(max(0.0, -yOffset), fullyExpandedHeightVal - fullyCollapsedHeightVal)
+        tableView.contentInset = .init(top: insetTopVal, left: 0.0, bottom: 0.0, right: 0.0)
+    }
 }
 
 // MARK:- ScrollViewContaining Delegate
@@ -64,17 +92,8 @@ class ContainingViewController: UIViewController {
 extension ContainingViewController: UIScrollViewDelegate {
     
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        
-        let newHeightVal: CGFloat = maxScrollVal - scrollView.contentOffset.y
-        headerTopLiftVal = min(0.0, max(maxScrollVal, newHeightVal))
-        
-        let insetTopVal: CGFloat = min(max(0.0, -scrollView.contentOffset.y), fullyExpandedHeightVal - fullyCollapsedHeightVal)
-        scrollView.contentInset = .init(top: insetTopVal, left: 0.0, bottom: 0.0, right: 0.0)
-        
-        print("\t\t scrollViewDidScroll - cont.off.y: \(scrollView.contentOffset.y.shortStr),\t inset.top: \(scrollView.contentInset.top.shortStr),\t headerTop.con: \(headerTopLiftVal.shortStr)")
-
-        // Changes color of header depending on collapse state
-        headerView.backgroundColor = headerTopLiftVal == maxScrollVal ? .orange : .systemIndigo
+        updateTableAndHeader(scrollView.contentOffset.y)
+        headerView.backgroundColor = headerTopLiftVal == fullExpandScrollVal ? .orange : .systemIndigo
     }
 }
 
@@ -97,16 +116,6 @@ extension ContainingViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat { UITableView.automaticDimension }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        tableView.deselectRow(at: indexPath, animated: false)
-        
-        fullyCollapsedHeightVal = fullyCollapsedHeightVal < 200.0 ? 220.0 : 140.0
-        UIView.animate(withDuration: 0.5) { [self] in
-            view.layoutIfNeeded()
-            let newHeightVal: CGFloat = maxScrollVal - tableView.contentOffset.y
-            headerTopLiftVal = min(0.0, max(maxScrollVal, newHeightVal))
-            
-            let insetTopVal: CGFloat = min(max(0.0, -tableView.contentOffset.y), fullyExpandedHeightVal - fullyCollapsedHeightVal)
-            tableView.contentInset = .init(top: insetTopVal, left: 0.0, bottom: 0.0, right: 0.0)
-        }
+        tableView.deselectRow(at: indexPath, animated: true)
     }
 }
