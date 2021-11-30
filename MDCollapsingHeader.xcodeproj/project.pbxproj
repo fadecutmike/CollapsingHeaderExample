@@ -16,7 +16,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		62F44684251E277D000A68A0 /* TestCollapsingHeader.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TestCollapsingHeader.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		62F44684251E277D000A68A0 /* MDCollapsingHeader.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MDCollapsingHeader.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		62F44687251E277D000A68A0 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		62F44689251E277D000A68A0 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
 		62F4468B251E277D000A68A0 /* ContainingViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContainingViewController.swift; sourceTree = "<group>"; };
@@ -40,7 +40,7 @@
 		62F4467B251E277D000A68A0 = {
 			isa = PBXGroup;
 			children = (
-				62F44686251E277D000A68A0 /* TestCollapsingHeader */,
+				62F44686251E277D000A68A0 /* MDCollapsingHeader */,
 				62F44685251E277D000A68A0 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -48,12 +48,12 @@
 		62F44685251E277D000A68A0 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				62F44684251E277D000A68A0 /* TestCollapsingHeader.app */,
+				62F44684251E277D000A68A0 /* MDCollapsingHeader.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
-		62F44686251E277D000A68A0 /* TestCollapsingHeader */ = {
+		62F44686251E277D000A68A0 /* MDCollapsingHeader */ = {
 			isa = PBXGroup;
 			children = (
 				62F44687251E277D000A68A0 /* AppDelegate.swift */,
@@ -64,15 +64,15 @@
 				62F44692251E277E000A68A0 /* LaunchScreen.storyboard */,
 				62F44695251E277E000A68A0 /* Info.plist */,
 			);
-			path = TestCollapsingHeader;
+			path = MDCollapsingHeader;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		62F44683251E277D000A68A0 /* TestCollapsingHeader */ = {
+		62F44683251E277D000A68A0 /* MDCollapsingHeader */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 62F44698251E277E000A68A0 /* Build configuration list for PBXNativeTarget "TestCollapsingHeader" */;
+			buildConfigurationList = 62F44698251E277E000A68A0 /* Build configuration list for PBXNativeTarget "MDCollapsingHeader" */;
 			buildPhases = (
 				62F44680251E277D000A68A0 /* Sources */,
 				62F44681251E277D000A68A0 /* Frameworks */,
@@ -82,9 +82,9 @@
 			);
 			dependencies = (
 			);
-			name = TestCollapsingHeader;
+			name = MDCollapsingHeader;
 			productName = TestCollapsingHeader;
-			productReference = 62F44684251E277D000A68A0 /* TestCollapsingHeader.app */;
+			productReference = 62F44684251E277D000A68A0 /* MDCollapsingHeader.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -101,7 +101,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 62F4467F251E277D000A68A0 /* Build configuration list for PBXProject "TestCollapsingHeader" */;
+			buildConfigurationList = 62F4467F251E277D000A68A0 /* Build configuration list for PBXProject "MDCollapsingHeader" */;
 			compatibilityVersion = "Xcode 9.3";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -114,7 +114,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				62F44683251E277D000A68A0 /* TestCollapsingHeader */,
+				62F44683251E277D000A68A0 /* MDCollapsingHeader */,
 			);
 		};
 /* End PBXProject section */
@@ -288,12 +288,12 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 7UMFPW78PV;
-				INFOPLIST_FILE = TestCollapsingHeader/Info.plist;
+				INFOPLIST_FILE = MDCollapsingHeader/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.willowtree.TestCollapsingHeader;
+				PRODUCT_BUNDLE_IDENTIFIER = com.md.MDCollapsingHeader;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -307,12 +307,12 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 7UMFPW78PV;
-				INFOPLIST_FILE = TestCollapsingHeader/Info.plist;
+				INFOPLIST_FILE = MDCollapsingHeader/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.willowtree.TestCollapsingHeader;
+				PRODUCT_BUNDLE_IDENTIFIER = com.md.MDCollapsingHeader;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -322,7 +322,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		62F4467F251E277D000A68A0 /* Build configuration list for PBXProject "TestCollapsingHeader" */ = {
+		62F4467F251E277D000A68A0 /* Build configuration list for PBXProject "MDCollapsingHeader" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				62F44696251E277E000A68A0 /* Debug */,
@@ -331,7 +331,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		62F44698251E277E000A68A0 /* Build configuration list for PBXNativeTarget "TestCollapsingHeader" */ = {
+		62F44698251E277E000A68A0 /* Build configuration list for PBXNativeTarget "MDCollapsingHeader" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				62F44699251E277E000A68A0 /* Debug */,
