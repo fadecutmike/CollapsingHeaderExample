@@ -99,5 +99,14 @@ extension ContainingViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: false)
         
+        fullyCollapsedHeightVal = fullyCollapsedHeightVal < 200.0 ? 220.0 : 140.0
+        UIView.animate(withDuration: 0.5) { [self] in
+            view.layoutIfNeeded()
+            let newHeightVal: CGFloat = maxScrollVal - tableView.contentOffset.y
+            headerTopLiftVal = min(0.0, max(maxScrollVal, newHeightVal))
+            
+            let insetTopVal: CGFloat = min(max(0.0, -tableView.contentOffset.y), fullyExpandedHeightVal - fullyCollapsedHeightVal)
+            tableView.contentInset = .init(top: insetTopVal, left: 0.0, bottom: 0.0, right: 0.0)
+        }
     }
 }
