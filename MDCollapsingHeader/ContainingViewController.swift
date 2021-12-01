@@ -8,16 +8,19 @@
 import UIKit
 
 // MARK:- Containing ViewController
-class ContainingViewController: UIViewController {
+class ContainingViewController: UIViewController, EVDHeaderDelegate {
     
     @IBOutlet weak var tableView: UITableView!
     
     /// The CGFloat value that controls the top elevator lift constraint of the HeaderView
     @IBOutlet weak var fullyExpandedHeightConstraint: NSLayoutConstraint!
+    
+    /// Active Header height
     private(set) var headerOperatingHeightVal: CGFloat = 0.0 {
         didSet { fullyExpandedHeightConstraint.constant = headerOperatingHeightVal }
     }
     
+    /// The largest size the Header can expand to
     lazy var maxOperatingHeight: CGFloat = fullyExpandedHeightConstraint.constant {
         didSet {
             headerOperatingHeightVal = maxOperatingHeight
@@ -25,19 +28,18 @@ class ContainingViewController: UIViewController {
         }
     }
     
-    var minOperatingHeight: CGFloat = 72.0
+    /// The smallest height the Header will collapse to
+    private(set) var minOperatingHeight: CGFloat = 72.0
+    
+    /// Parameter that stores `oldValue` values from `maxOperatingDiff` didSet property observer
+    /// Easily close expanded elements like a scoreboard webView
     private(set) var expandedHeightDiff: CGFloat = 0.0
 
     override func viewDidLoad() {
         super.viewDidLoad()
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: "cell")
-                
-        if headerOperatingHeightVal == 0.0 {
-            DispatchQueue.main.async { [self] in
-                headerOperatingHeightVal = fullyExpandedHeightConstraint.constant
-            }
-        }
-        
+                        
+        // By default, open with header fully expanded
         expandHeaderFully()
     }
     
@@ -45,42 +47,21 @@ class ContainingViewController: UIViewController {
         if let val = minHeight { minOperatingHeight = val }
         if let val = maxHeight { maxOperatingHeight = val }
     }
-        
-    @IBAction func headerButtonPressed(_ sender: UIButton) {
-        
-        DispatchQueue.main.async { [self] in
-            let shouldCollapse = maxOperatingHeight > 300.0
-            maxOperatingHeight = shouldCollapse ? 250.0 : 376.0
-            
-            print("\n\t\t btnPressed - yOff: \(tableView.contentOffset.y.shortStr), exHDiff: \(expandedHeightDiff.shortStr),\t fullyExpVal: \(headerOperatingHeightVal.shortStr)\n")
-            sender.setTitle("\(shouldCollapse ? "Show" : "Hide") Scoreboard", for: .normal)
-        }
-        
-        if expandedHeightDiff > 0 {
-            expandHeaderFully()
-        } else {
-            collapseScoreboard()
-        }
-        
-        UIView.animate(withDuration: 0.3) { self.view.layoutIfNeeded() }
-    }
     
     private func expandHeaderFully() {
-        DispatchQueue.main.async { [self] in
-            print("\n\t\t expandHeaderFully(1) began - yOff: \(tableView.contentOffset.y.shortStr), yInset: \(tableView.contentInset.top.shortStr),\t expandDiff: \(expandedHeightDiff.shortStr)")
-            self.tableView.contentInset.top = maxOperatingHeight
-            self.tableView.contentOffset.y = maxOperatingHeight
-            print("\t\t expandHeaderFully(2) ended - yOff: \(tableView.contentOffset.y.shortStr), yInset: \(tableView.contentInset.top.shortStr),\t expandDiff: \(expandedHeightDiff.shortStr)\n")
-        }
+        headerOperatingHeightVal   = maxOperatingHeight
+        tableView.contentOffset.y  = -maxOperatingHeight
+        tableView.contentInset.top = maxOperatingHeight
     }
     
     private func collapseScoreboard() {
-        DispatchQueue.main.async { [self] in
-            print("\n\t\t collapseScoreboard(1) began - yOff: \(tableView.contentOffset.y.shortStr), yInset: \(tableView.contentInset.top.shortStr),\t expandDiff: \(expandedHeightDiff.shortStr)")
-            tableView.contentInset.top += expandedHeightDiff
-            tableView.contentOffset.y += expandedHeightDiff
-            print("\n\t\t collapseScoreboard(2) ended - yOff: \(tableView.contentOffset.y.shortStr), yInset: \(tableView.contentInset.top.shortStr),\t expandDiff: \(expandedHeightDiff.shortStr)")
-        }
+        tableView.contentInset.top += expandedHeightDiff
+        tableView.contentOffset.y  += expandedHeightDiff
+    }
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        super.prepare(for: segue, sender: sender)
+        if let vc = segue.destination as? HeaderVC { vc.delegate = self }
     }
 }
 
@@ -91,30 +72,36 @@ extension ContainingViewController: UIScrollViewDelegate {
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
         
         if (scrollView.isTracking || scrollView.isDragging || scrollView.isDecelerating) {
-            
-            let modVal       : CGFloat = scrollView.contentInset.top + scrollView.contentOffset.y
-            let insetTop     : CGFloat = max(minOperatingHeight, tableView.contentInset.top - modVal)
-            let headerHeight : CGFloat = max(minOperatingHeight, headerOperatingHeightVal - modVal)
-            
-            print("didScroll - insetTop: \(insetTop.shortStr),\t headerH: \(headerHeight.shortStr)")
-            
-            tableView.contentInset.top = min(maxOperatingHeight, insetTop)
-            headerOperatingHeightVal = min(maxOperatingHeight, headerHeight)
+            headerOperatingHeightVal   = computeFloatVal(headerOperatingHeightVal)
+            tableView.contentInset.top = computeFloatVal(tableView.contentInset.top)
         }
     }
     
     func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
         if decelerate { finishedScrollSmoothHeaderUpdate() }
     }
-    
+
     func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
         finishedScrollSmoothHeaderUpdate()
     }
-        
+
     private func finishedScrollSmoothHeaderUpdate() {
         DispatchQueue.main.async { [self] in
             UIView.animate(withDuration: 0.3) { self.view.layoutIfNeeded() }
         }
+    }
+    
+    private func computeFloatVal(_ input: CGFloat) -> CGFloat {
+        let modVal: CGFloat = tableView.contentInset.top + tableView.contentOffset.y
+        let result: CGFloat = max(minOperatingHeight, input - modVal)
+        return min(maxOperatingHeight, result)
+    }
+    
+    func btnPressed() {
+        let shouldCollapse = maxOperatingHeight > 300.0
+        maxOperatingHeight = shouldCollapse ? 250.0 : 376.0
+        _ = expandedHeightDiff > 0 ? expandHeaderFully() : collapseScoreboard()
+        UIView.animate(withDuration: 0.3) { self.view.layoutIfNeeded() }
     }
 }
 
@@ -122,8 +109,7 @@ extension ContainingViewController: UIScrollViewDelegate {
 
 extension ContainingViewController: UITableViewDelegate, UITableViewDataSource {
 
-    func numberOfSections(in tableView: UITableView)                                -> Int { 1 }
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int)    -> Int { 3 }
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int)    -> Int { 110 }
     func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat { 0.0 }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -134,8 +120,7 @@ extension ContainingViewController: UITableViewDelegate, UITableViewDataSource {
         return cell
     }
 
-    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat { 18.0 }
-    
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat { UITableView.automaticDimension }
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
     }
