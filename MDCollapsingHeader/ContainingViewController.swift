@@ -18,7 +18,7 @@ class ContainingViewController: UIViewController, EVDHeaderDelegate {
     var maxOperatingHeight: CGFloat = 376.0
     
     /// The smallest height the Header will collapse to
-    private(set) var minOperatingHeight: CGFloat = 155.0
+    private(set) var minOperatingHeight: CGFloat = 156.0
     
     /// Tracks the contentOffset.y value of the tableView and applies an adjustment to account for LiftingHeader so only positive values starting at zero are returned
     var lastScrollOffsetClean: CGFloat = 0.0
