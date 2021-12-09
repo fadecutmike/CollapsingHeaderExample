@@ -109,12 +109,13 @@ extension ContainingViewController: UIScrollViewDelegate {
     func expandLiftingHeader(_ willExpand: Bool = true) {
         DispatchQueue.main.async { [self] in
             headerVC.sbButton.setTitle("\(willExpand ? "Hide" : "Show") Scoreboard", for: .normal)
-            liftingHeaderOriginY = (willExpand ? 0.0 : minOperatingHeight - maxOperatingHeight) + tableView.frame.origin.y
-            
-            let liftHeight: CGFloat = willExpand ? -maxOperatingHeight : minOperatingHeight
-            tableView.contentOffset.y = lastScrollOffsetClean + liftHeight * (willExpand ? 1.0 : -1.0)
-            tableView.contentInset.top = abs(liftHeight)
-            lastScrollOffsetClean = tableView.contentOffset.y + (willExpand ? maxOperatingHeight : minOperatingHeight)
+            UIView.animate(withDuration: 0.35) { [self] in
+                liftingHeaderOriginY = (willExpand ? 0.0 : minOperatingHeight - maxOperatingHeight) + tableView.frame.origin.y
+                let liftHeight: CGFloat = willExpand ? -maxOperatingHeight : minOperatingHeight
+                tableView.contentOffset.y = lastScrollOffsetClean + liftHeight * (willExpand ? 1.0 : -1.0)
+                tableView.contentInset.top = abs(liftHeight)
+                lastScrollOffsetClean = tableView.contentOffset.y + (willExpand ? maxOperatingHeight : minOperatingHeight)
+            }
         }
     }
 }
