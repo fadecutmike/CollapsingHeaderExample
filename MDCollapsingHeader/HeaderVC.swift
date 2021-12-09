@@ -14,6 +14,7 @@ protocol EVDHeaderDelegate: AnyObject {
 class HeaderVC: UIViewController {
     
     weak var delegate: EVDHeaderDelegate?
+    @IBOutlet var sbButton: UIButton!
     
     override func viewDidLoad() {
         super.viewDidLoad()
