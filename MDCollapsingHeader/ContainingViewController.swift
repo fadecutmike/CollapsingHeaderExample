@@ -30,16 +30,18 @@ class ContainingViewController: UIViewController, EVDHeaderDelegate {
     var currentHeaderHeight: CGFloat { (liftingHeaderOriginY + liftingHeader.frame.height) - tableView.frame.origin.y }
     
     /// Value which directly sets the origin.y parameter on the LiftingHeader
-    var liftingHeaderOriginY: CGFloat = 0.0 {
-        didSet {
-            if liftingHeader.frame.origin.y != liftingHeaderOriginY { liftingHeader.frame.origin.y = liftingHeaderOriginY }
-        }
+    lazy var liftingHeaderOriginY: CGFloat = tableView.frame.origin.x {
+        didSet { liftingHeader.frame.origin.y = liftingHeaderOriginY }
     }
 
     override func viewDidLoad() {
         super.viewDidLoad()
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: "cell")
                         
+        tableView.setContentOffset(.init(x: 0.0, y: -maxOperatingHeight), animated: false)
+        tableView.contentInset.top = maxOperatingHeight
+        liftingHeaderOriginY = tableView.frame.origin.y
+        
         // By default, open with header fully expanded
         expandLiftingHeader()
     }
@@ -62,16 +64,18 @@ extension ContainingViewController: UIScrollViewDelegate {
         if (scrollView.isTracking || scrollView.isDragging || scrollView.isDecelerating) {
             let headerHeight: CGFloat = currentHeaderHeight
             
+            print("\t\t\t scrollViewDidScroll A - scrollV.offset: \(scrollView.contentOffset.y.shortStr),\t liftHeaderOrig: \(liftingHeaderOriginY.shortStr),\t tableV.origin: \(tableView.frame.origin.y.shortStr),\t headerH: \(headerHeight.shortStr),\t lastScrollOffClean: \(lastScrollOffsetClean.shortStr),\t scrollRev: \(lastScrollReverseOffset?.shortStr ?? "nil")")
+            
             // Normalized scroll offset.y value accounting for headerHeight and returning only positive offset values
             let cleanOffsetY: CGFloat = scrollView.contentOffset.y + headerHeight
             let alreadyCollapsed = lastScrollOffsetClean < cleanOffsetY && headerHeight == minOperatingHeight
             let alreadyExpanded  = lastScrollOffsetClean > cleanOffsetY && headerHeight == maxOperatingHeight
-            
+                        
             if alreadyCollapsed || alreadyExpanded {
                 /// Represents scrolling where the direction and offset has no effect on the header, such as continuing to scroll down with fully collapsed header
                 lastScrollReverseOffset = nil
-                lastScrollOffsetClean        = cleanOffsetY
-                                
+                lastScrollOffsetClean = cleanOffsetY
+                                                
                 let sbTitle = headerVC.sbButton.title(for: .normal) ?? ""
                 if alreadyCollapsed, sbTitle.contains("Hide") {
                     headerVC.sbButton.setTitle("Show Scoreboard", for: .normal)
@@ -84,20 +88,13 @@ extension ContainingViewController: UIScrollViewDelegate {
             
             // Determines the point where an expanded header can begin collapsing, i.e. the instant you begin scrolling back up
             if headerHeight == maxOperatingHeight, cleanOffsetY > lastScrollOffsetClean, lastScrollReverseOffset == nil, cleanOffsetY > minOperatingHeight { lastScrollReverseOffset = cleanOffsetY }
-            
             lastScrollOffsetClean = cleanOffsetY
             
-            var result: CGFloat?
-            if let reversePoint = lastScrollReverseOffset {
-                let collapseVal: CGFloat = scrollView.contentInset.top + (reversePoint - lastScrollOffsetClean)
-                result = min(maxOperatingHeight, max(minOperatingHeight, collapseVal))
-            } else {
-                result = min(maxOperatingHeight, max(minOperatingHeight, scrollView.contentInset.top - cleanOffsetY))
-            }
+            let maxLimit = ((tableView.frame.origin.y - maxOperatingHeight) + minOperatingHeight)
+            let minLimit = min(tableView.frame.origin.y, ((tableView.frame.origin.y - max(0.0, maxOperatingHeight + scrollView.contentOffset.y)) + (lastScrollReverseOffset ?? 0.0)))
+            liftingHeaderOriginY = max(maxLimit, minLimit)
             
-            if let topInset = result, scrollView.contentInset.top != topInset { scrollView.contentInset.top = topInset }
-            
-            liftingHeaderOriginY = -(maxOperatingHeight - scrollView.contentInset.top) + scrollView.frame.origin.y
+            print("\t\t\t scrollViewDidScroll B - scrollV.offset: \(scrollView.contentOffset.y.shortStr),\t liftHeaderOrig: \(liftingHeaderOriginY.shortStr),\t tableV.origin: \(tableView.frame.origin.y.shortStr),\t headerH: \(headerHeight.shortStr),\t lastScrollOffClean: \(lastScrollOffsetClean.shortStr),\t scrollRev: \(lastScrollReverseOffset?.shortStr ?? "nil")")
         }
     }
         
@@ -110,11 +107,16 @@ extension ContainingViewController: UIScrollViewDelegate {
         DispatchQueue.main.async { [self] in
             headerVC.sbButton.setTitle("\(willExpand ? "Hide" : "Show") Scoreboard", for: .normal)
             UIView.animate(withDuration: 0.35) { [self] in
-                liftingHeaderOriginY = (willExpand ? 0.0 : minOperatingHeight - maxOperatingHeight) + tableView.frame.origin.y
-                let liftHeight: CGFloat = willExpand ? -maxOperatingHeight : minOperatingHeight
-                tableView.contentOffset.y = lastScrollOffsetClean + liftHeight * (willExpand ? 1.0 : -1.0)
-                tableView.contentInset.top = abs(liftHeight)
-                lastScrollOffsetClean = tableView.contentOffset.y + (willExpand ? maxOperatingHeight : minOperatingHeight)
+                let newHeaderOrigin = (willExpand ? 0.0 : minOperatingHeight - maxOperatingHeight) + tableView.frame.origin.y
+                let headerOriginDiff = liftingHeaderOriginY-newHeaderOrigin
+
+                print("\n\n\t\t\t expandLiftHeader A - scrollV.offset: \(tableView.contentOffset.y.shortStr),\t liftHeaderOrig: \(liftingHeaderOriginY.shortStr),\t tableV.origin: \(tableView.frame.origin.y.shortStr),\t headerOriginDiff: \(headerOriginDiff.shortStr),\t headerH: \(currentHeaderHeight.shortStr),\t lastScrollOffClean: \(lastScrollOffsetClean.shortStr),\t scrollRev: \(lastScrollReverseOffset?.shortStr ?? "nil")")
+                
+                liftingHeaderOriginY = newHeaderOrigin
+                tableView.contentOffset.y += headerOriginDiff
+                lastScrollOffsetClean = tableView.contentOffset.y + currentHeaderHeight
+                
+                print("\t\t\t expandLiftHeader B - scrollV.offset: \(tableView.contentOffset.y.shortStr),\t liftHeaderOrig: \(liftingHeaderOriginY.shortStr),\t tableV.origin: \(tableView.frame.origin.y.shortStr),\t headerOriginDiff: \(headerOriginDiff.shortStr),\t headerH: \(currentHeaderHeight.shortStr),\t lastScrollOffClean: \(lastScrollOffsetClean.shortStr),\t scrollRev: \(lastScrollReverseOffset?.shortStr ?? "nil")\n\n")
             }
         }
     }
