@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="19529" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina6_1" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="19519"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" rowHeight="58" id="hFK-92-GTT" customClass="EventDetailsShowAllCell" customModule="MDCollapsingHeader" customModuleProvider="target">
+            <rect key="frame" x="0.0" y="0.0" width="414" height="58"/>
+            <autoresizingMask key="autoresizingMask"/>
+            <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="hFK-92-GTT" id="XOz-hV-AO8">
+                <rect key="frame" x="0.0" y="0.0" width="414" height="58"/>
+                <autoresizingMask key="autoresizingMask"/>
+                <subviews>
+                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="FHe-ge-IeN">
+                        <rect key="frame" x="154.5" y="14" width="105.5" height="18"/>
+                        <constraints>
+                            <constraint firstAttribute="height" constant="18" id="4hy-1S-HUQ"/>
+                        </constraints>
+                        <state key="normal" title="Button"/>
+                        <buttonConfiguration key="configuration" style="plain" title="Show more" titleAlignment="center">
+                            <fontDescription key="titleFontDescription" name="ProximaNovaCond-Medium" family="Proxima Nova Condensed" pointSize="16"/>
+                        </buttonConfiguration>
+                        <connections>
+                            <action selector="showAllBtnTapped:" destination="hFK-92-GTT" eventType="touchUpInside" id="3cQ-U3-mIi"/>
+                        </connections>
+                    </button>
+                </subviews>
+                <constraints>
+                    <constraint firstAttribute="bottom" secondItem="FHe-ge-IeN" secondAttribute="bottom" constant="26" id="FNu-it-K8h"/>
+                    <constraint firstItem="FHe-ge-IeN" firstAttribute="centerX" secondItem="XOz-hV-AO8" secondAttribute="centerX" id="Mzy-my-zwF"/>
+                    <constraint firstItem="FHe-ge-IeN" firstAttribute="top" secondItem="XOz-hV-AO8" secondAttribute="top" constant="14" id="bPA-nB-MOA"/>
+                </constraints>
+            </tableViewCellContentView>
+            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+            <connections>
+                <outlet property="showAllBtn" destination="FHe-ge-IeN" id="MnW-rv-uee"/>
+            </connections>
+            <point key="canvasLocation" x="88.405797101449281" y="34.821428571428569"/>
+        </tableViewCell>
+    </objects>
+</document>

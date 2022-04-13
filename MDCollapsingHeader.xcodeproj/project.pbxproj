@@ -3,10 +3,41 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 50;
+	objectVersion = 52;
 	objects = {
 
 /* Begin PBXBuildFile section */
+		00C54A7F27C1E4AA00E877A6 /* WHSportsbook in Frameworks */ = {isa = PBXBuildFile; productRef = 00C54A7E27C1E4AA00E877A6 /* WHSportsbook */; };
+		00C54A8227C1E4D800E877A6 /* WHNetwork in Frameworks */ = {isa = PBXBuildFile; productRef = 00C54A8127C1E4D800E877A6 /* WHNetwork */; };
+		00C54A8927C1E5C900E877A6 /* EVDLiftingHeaderVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00C54A8427C1E5C900E877A6 /* EVDLiftingHeaderVC.swift */; };
+		00C54A8A27C1E5C900E877A6 /* eventsPage.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 00C54A8527C1E5C900E877A6 /* eventsPage.storyboard */; };
+		00C54A9127C1E5DA00E877A6 /* EventDetailsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00C54A8F27C1E5DA00E877A6 /* EventDetailsViewController.swift */; };
+		00C54A9D27C1E5E900E877A6 /* EventDetailTableCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00C54A9227C1E5E900E877A6 /* EventDetailTableCell.swift */; };
+		00C54A9E27C1E5E900E877A6 /* EVDTabsGroupingCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 00C54A9327C1E5E900E877A6 /* EVDTabsGroupingCell.xib */; };
+		00C54A9F27C1E5E900E877A6 /* EVDSectionCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00C54A9427C1E5E900E877A6 /* EVDSectionCell.swift */; };
+		00C54AA027C1E5E900E877A6 /* EVDAltSpreadCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 00C54A9527C1E5E900E877A6 /* EVDAltSpreadCell.xib */; };
+		00C54AA127C1E5E900E877A6 /* EVDAltSpreadCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00C54A9627C1E5E900E877A6 /* EVDAltSpreadCell.swift */; };
+		00C54AA227C1E5E900E877A6 /* EventDetailMarketTemplateCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 00C54A9727C1E5E900E877A6 /* EventDetailMarketTemplateCell.xib */; };
+		00C54AA327C1E5E900E877A6 /* EVDTabsGroupingCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00C54A9827C1E5E900E877A6 /* EVDTabsGroupingCell.swift */; };
+		00C54AA427C1E5E900E877A6 /* EventDetailMarketSelectionCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 00C54A9927C1E5E900E877A6 /* EventDetailMarketSelectionCell.xib */; };
+		00C54AA527C1E5E900E877A6 /* EventDetailsShowAllCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00C54A9A27C1E5E900E877A6 /* EventDetailsShowAllCell.swift */; };
+		00C54AA627C1E5E900E877A6 /* EventDetailsShowAllCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 00C54A9B27C1E5E900E877A6 /* EventDetailsShowAllCell.xib */; };
+		00C54AA727C1E5E900E877A6 /* EVDSectionCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 00C54A9C27C1E5E900E877A6 /* EVDSectionCell.xib */; };
+		00C54AAB27C1E64000E877A6 /* EVDLiftingHeaderVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00C54AA927C1E64000E877A6 /* EVDLiftingHeaderVM.swift */; };
+		00C54AAC27C1E64000E877A6 /* EventDetailsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00C54AAA27C1E64000E877A6 /* EventDetailsViewModel.swift */; };
+		00C54AAE27C2006500E877A6 /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00C54AAD27C2006500E877A6 /* Extensions.swift */; };
+		00C54AB027C2078B00E877A6 /* UISixPackButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00C54AAF27C2078B00E877A6 /* UISixPackButton.swift */; };
+		00C54AB327C207F300E877A6 /* CZPackButtonData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00C54AB227C207F300E877A6 /* CZPackButtonData.swift */; };
+		00C54AB527C2081B00E877A6 /* WHHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00C54AB427C2081B00E877A6 /* WHHelpers.swift */; };
+		00C54AB727C2087E00E877A6 /* ThemeColors.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 00C54AB627C2087E00E877A6 /* ThemeColors.xcassets */; };
+		00C54AB927C23AB400E877A6 /* MSPBaseCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00C54AB827C23AB400E877A6 /* MSPBaseCell.swift */; };
+		00C54AC027C23B1E00E877A6 /* MSPTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00C54ABA27C23B1D00E877A6 /* MSPTableViewCell.swift */; };
+		00C54AC127C23B1E00E877A6 /* MagicSixPackCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 00C54ABB27C23B1D00E877A6 /* MagicSixPackCell.xib */; };
+		00C54AC227C23B1E00E877A6 /* MagicSixPackCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00C54ABC27C23B1D00E877A6 /* MagicSixPackCell.swift */; };
+		00C54AC427C23B1E00E877A6 /* MSPTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 00C54ABE27C23B1D00E877A6 /* MSPTableViewCell.xib */; };
+		00C54AC827C2D00A00E877A6 /* FilterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00C54AC727C2D00A00E877A6 /* FilterView.swift */; };
+		00C54AD027C2D08700E877A6 /* FilterDataCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00C54ACC27C2D08700E877A6 /* FilterDataCell.swift */; };
+		00C54AD127C2D08700E877A6 /* FilterDataCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 00C54ACD27C2D08700E877A6 /* FilterDataCell.xib */; };
 		62F44688251E277D000A68A0 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 62F44687251E277D000A68A0 /* AppDelegate.swift */; };
 		62F4468A251E277D000A68A0 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 62F44689251E277D000A68A0 /* SceneDelegate.swift */; };
 		62F4468C251E277D000A68A0 /* ContainingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 62F4468B251E277D000A68A0 /* ContainingViewController.swift */; };
@@ -17,6 +48,35 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		00C54A8427C1E5C900E877A6 /* EVDLiftingHeaderVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = EVDLiftingHeaderVC.swift; path = MDCollapsingHeader/EVD/EVDLiftingHeaderVC.swift; sourceTree = SOURCE_ROOT; };
+		00C54A8527C1E5C900E877A6 /* eventsPage.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = eventsPage.storyboard; path = MDCollapsingHeader/EVD/eventsPage.storyboard; sourceTree = SOURCE_ROOT; };
+		00C54A8F27C1E5DA00E877A6 /* EventDetailsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = EventDetailsViewController.swift; path = MDCollapsingHeader/EVD/EventDetailsViewController.swift; sourceTree = SOURCE_ROOT; };
+		00C54A9227C1E5E900E877A6 /* EventDetailTableCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = EventDetailTableCell.swift; path = MDCollapsingHeader/EVD/Cells/EventDetailTableCell.swift; sourceTree = SOURCE_ROOT; };
+		00C54A9327C1E5E900E877A6 /* EVDTabsGroupingCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = EVDTabsGroupingCell.xib; path = MDCollapsingHeader/EVD/Cells/EVDTabsGroupingCell.xib; sourceTree = SOURCE_ROOT; };
+		00C54A9427C1E5E900E877A6 /* EVDSectionCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = EVDSectionCell.swift; path = MDCollapsingHeader/EVD/Cells/EVDSectionCell.swift; sourceTree = SOURCE_ROOT; };
+		00C54A9527C1E5E900E877A6 /* EVDAltSpreadCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = EVDAltSpreadCell.xib; path = MDCollapsingHeader/EVD/Cells/EVDAltSpreadCell.xib; sourceTree = SOURCE_ROOT; };
+		00C54A9627C1E5E900E877A6 /* EVDAltSpreadCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = EVDAltSpreadCell.swift; path = MDCollapsingHeader/EVD/Cells/EVDAltSpreadCell.swift; sourceTree = SOURCE_ROOT; };
+		00C54A9727C1E5E900E877A6 /* EventDetailMarketTemplateCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = EventDetailMarketTemplateCell.xib; path = MDCollapsingHeader/EVD/Cells/EventDetailMarketTemplateCell.xib; sourceTree = SOURCE_ROOT; };
+		00C54A9827C1E5E900E877A6 /* EVDTabsGroupingCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = EVDTabsGroupingCell.swift; path = MDCollapsingHeader/EVD/Cells/EVDTabsGroupingCell.swift; sourceTree = SOURCE_ROOT; };
+		00C54A9927C1E5E900E877A6 /* EventDetailMarketSelectionCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = EventDetailMarketSelectionCell.xib; path = MDCollapsingHeader/EVD/Cells/EventDetailMarketSelectionCell.xib; sourceTree = SOURCE_ROOT; };
+		00C54A9A27C1E5E900E877A6 /* EventDetailsShowAllCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = EventDetailsShowAllCell.swift; path = MDCollapsingHeader/EVD/Cells/EventDetailsShowAllCell.swift; sourceTree = SOURCE_ROOT; };
+		00C54A9B27C1E5E900E877A6 /* EventDetailsShowAllCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = EventDetailsShowAllCell.xib; path = MDCollapsingHeader/EVD/Cells/EventDetailsShowAllCell.xib; sourceTree = SOURCE_ROOT; };
+		00C54A9C27C1E5E900E877A6 /* EVDSectionCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = EVDSectionCell.xib; path = MDCollapsingHeader/EVD/Cells/EVDSectionCell.xib; sourceTree = SOURCE_ROOT; };
+		00C54AA927C1E64000E877A6 /* EVDLiftingHeaderVM.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = EVDLiftingHeaderVM.swift; path = MDCollapsingHeader/EVD/EVDLiftingHeaderVM.swift; sourceTree = SOURCE_ROOT; };
+		00C54AAA27C1E64000E877A6 /* EventDetailsViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = EventDetailsViewModel.swift; path = MDCollapsingHeader/EVD/EventDetailsViewModel.swift; sourceTree = SOURCE_ROOT; };
+		00C54AAD27C2006500E877A6 /* Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
+		00C54AAF27C2078B00E877A6 /* UISixPackButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UISixPackButton.swift; sourceTree = "<group>"; };
+		00C54AB227C207F300E877A6 /* CZPackButtonData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CZPackButtonData.swift; sourceTree = "<group>"; };
+		00C54AB427C2081B00E877A6 /* WHHelpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WHHelpers.swift; sourceTree = "<group>"; };
+		00C54AB627C2087E00E877A6 /* ThemeColors.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = ThemeColors.xcassets; sourceTree = "<group>"; };
+		00C54AB827C23AB400E877A6 /* MSPBaseCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MSPBaseCell.swift; sourceTree = "<group>"; };
+		00C54ABA27C23B1D00E877A6 /* MSPTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MSPTableViewCell.swift; sourceTree = "<group>"; };
+		00C54ABB27C23B1D00E877A6 /* MagicSixPackCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = MagicSixPackCell.xib; sourceTree = "<group>"; };
+		00C54ABC27C23B1D00E877A6 /* MagicSixPackCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MagicSixPackCell.swift; sourceTree = "<group>"; };
+		00C54ABE27C23B1D00E877A6 /* MSPTableViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = MSPTableViewCell.xib; sourceTree = "<group>"; };
+		00C54AC727C2D00A00E877A6 /* FilterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilterView.swift; sourceTree = "<group>"; };
+		00C54ACC27C2D08700E877A6 /* FilterDataCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FilterDataCell.swift; sourceTree = "<group>"; };
+		00C54ACD27C2D08700E877A6 /* FilterDataCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = FilterDataCell.xib; sourceTree = "<group>"; };
 		62F44684251E277D000A68A0 /* MDCollapsingHeader.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MDCollapsingHeader.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		62F44687251E277D000A68A0 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		62F44689251E277D000A68A0 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -33,12 +93,80 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				00C54A8227C1E4D800E877A6 /* WHNetwork in Frameworks */,
+				00C54A7F27C1E4AA00E877A6 /* WHSportsbook in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		00C54A8327C1E5B800E877A6 /* EVD */ = {
+			isa = PBXGroup;
+			children = (
+				00C54A8427C1E5C900E877A6 /* EVDLiftingHeaderVC.swift */,
+				00C54AC927C2D06C00E877A6 /* FilterView */,
+				00C54AB127C207CD00E877A6 /* Magic Six Pack */,
+				00C54AA927C1E64000E877A6 /* EVDLiftingHeaderVM.swift */,
+				00C54A8F27C1E5DA00E877A6 /* EventDetailsViewController.swift */,
+				00C54AAA27C1E64000E877A6 /* EventDetailsViewModel.swift */,
+				00C54AA827C1E5F600E877A6 /* Cells */,
+				00C54A8527C1E5C900E877A6 /* eventsPage.storyboard */,
+			);
+			path = EVD;
+			sourceTree = "<group>";
+		};
+		00C54AA827C1E5F600E877A6 /* Cells */ = {
+			isa = PBXGroup;
+			children = (
+				00C54A9627C1E5E900E877A6 /* EVDAltSpreadCell.swift */,
+				00C54A9527C1E5E900E877A6 /* EVDAltSpreadCell.xib */,
+				00C54A9427C1E5E900E877A6 /* EVDSectionCell.swift */,
+				00C54A9C27C1E5E900E877A6 /* EVDSectionCell.xib */,
+				00C54A9827C1E5E900E877A6 /* EVDTabsGroupingCell.swift */,
+				00C54A9327C1E5E900E877A6 /* EVDTabsGroupingCell.xib */,
+				00C54A9927C1E5E900E877A6 /* EventDetailMarketSelectionCell.xib */,
+				00C54A9727C1E5E900E877A6 /* EventDetailMarketTemplateCell.xib */,
+				00C54A9A27C1E5E900E877A6 /* EventDetailsShowAllCell.swift */,
+				00C54A9B27C1E5E900E877A6 /* EventDetailsShowAllCell.xib */,
+				00C54A9227C1E5E900E877A6 /* EventDetailTableCell.swift */,
+			);
+			path = Cells;
+			sourceTree = "<group>";
+		};
+		00C54AB127C207CD00E877A6 /* Magic Six Pack */ = {
+			isa = PBXGroup;
+			children = (
+				00C54AAF27C2078B00E877A6 /* UISixPackButton.swift */,
+				00C54AC627C23B2F00E877A6 /* Cells */,
+				00C54AB227C207F300E877A6 /* CZPackButtonData.swift */,
+				00C54AB427C2081B00E877A6 /* WHHelpers.swift */,
+			);
+			path = "Magic Six Pack";
+			sourceTree = "<group>";
+		};
+		00C54AC627C23B2F00E877A6 /* Cells */ = {
+			isa = PBXGroup;
+			children = (
+				00C54ABC27C23B1D00E877A6 /* MagicSixPackCell.swift */,
+				00C54ABB27C23B1D00E877A6 /* MagicSixPackCell.xib */,
+				00C54ABA27C23B1D00E877A6 /* MSPTableViewCell.swift */,
+				00C54ABE27C23B1D00E877A6 /* MSPTableViewCell.xib */,
+				00C54AB827C23AB400E877A6 /* MSPBaseCell.swift */,
+			);
+			path = Cells;
+			sourceTree = "<group>";
+		};
+		00C54AC927C2D06C00E877A6 /* FilterView */ = {
+			isa = PBXGroup;
+			children = (
+				00C54ACC27C2D08700E877A6 /* FilterDataCell.swift */,
+				00C54ACD27C2D08700E877A6 /* FilterDataCell.xib */,
+				00C54AC727C2D00A00E877A6 /* FilterView.swift */,
+			);
+			path = FilterView;
+			sourceTree = "<group>";
+		};
 		62F4467B251E277D000A68A0 = {
 			isa = PBXGroup;
 			children = (
@@ -61,8 +189,11 @@
 				62F44687251E277D000A68A0 /* AppDelegate.swift */,
 				62F44689251E277D000A68A0 /* SceneDelegate.swift */,
 				62F4468B251E277D000A68A0 /* ContainingViewController.swift */,
+				00C54AAD27C2006500E877A6 /* Extensions.swift */,
+				00C54A8327C1E5B800E877A6 /* EVD */,
 				89B4BF4C27570BFC003D426B /* HeaderVC.swift */,
 				62F4468D251E277D000A68A0 /* Main.storyboard */,
+				00C54AB627C2087E00E877A6 /* ThemeColors.xcassets */,
 				62F44690251E277E000A68A0 /* Assets.xcassets */,
 				62F44692251E277E000A68A0 /* LaunchScreen.storyboard */,
 				62F44695251E277E000A68A0 /* Info.plist */,
@@ -86,6 +217,10 @@
 			dependencies = (
 			);
 			name = MDCollapsingHeader;
+			packageProductDependencies = (
+				00C54A7E27C1E4AA00E877A6 /* WHSportsbook */,
+				00C54A8127C1E4D800E877A6 /* WHNetwork */,
+			);
 			productName = TestCollapsingHeader;
 			productReference = 62F44684251E277D000A68A0 /* MDCollapsingHeader.app */;
 			productType = "com.apple.product-type.application";
@@ -113,6 +248,10 @@
 				Base,
 			);
 			mainGroup = 62F4467B251E277D000A68A0;
+			packageReferences = (
+				00C54A7D27C1E4A900E877A6 /* XCRemoteSwiftPackageReference "WHSportsbook" */,
+				00C54A8027C1E4D700E877A6 /* XCRemoteSwiftPackageReference "WHNetwork" */,
+			);
 			productRefGroup = 62F44685251E277D000A68A0 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -127,9 +266,20 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				00C54AA427C1E5E900E877A6 /* EventDetailMarketSelectionCell.xib in Resources */,
+				00C54AA227C1E5E900E877A6 /* EventDetailMarketTemplateCell.xib in Resources */,
 				62F44694251E277E000A68A0 /* LaunchScreen.storyboard in Resources */,
+				00C54AA727C1E5E900E877A6 /* EVDSectionCell.xib in Resources */,
 				62F44691251E277E000A68A0 /* Assets.xcassets in Resources */,
+				00C54AC127C23B1E00E877A6 /* MagicSixPackCell.xib in Resources */,
+				00C54A9E27C1E5E900E877A6 /* EVDTabsGroupingCell.xib in Resources */,
+				00C54AA027C1E5E900E877A6 /* EVDAltSpreadCell.xib in Resources */,
+				00C54A8A27C1E5C900E877A6 /* eventsPage.storyboard in Resources */,
+				00C54AC427C23B1E00E877A6 /* MSPTableViewCell.xib in Resources */,
+				00C54AA627C1E5E900E877A6 /* EventDetailsShowAllCell.xib in Resources */,
 				62F4468F251E277D000A68A0 /* Main.storyboard in Resources */,
+				00C54AB727C2087E00E877A6 /* ThemeColors.xcassets in Resources */,
+				00C54AD127C2D08700E877A6 /* FilterDataCell.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -140,10 +290,28 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				00C54AC027C23B1E00E877A6 /* MSPTableViewCell.swift in Sources */,
+				00C54AA327C1E5E900E877A6 /* EVDTabsGroupingCell.swift in Sources */,
+				00C54AB927C23AB400E877A6 /* MSPBaseCell.swift in Sources */,
+				00C54AB527C2081B00E877A6 /* WHHelpers.swift in Sources */,
 				62F4468C251E277D000A68A0 /* ContainingViewController.swift in Sources */,
+				00C54A9F27C1E5E900E877A6 /* EVDSectionCell.swift in Sources */,
+				00C54AB327C207F300E877A6 /* CZPackButtonData.swift in Sources */,
+				00C54AC827C2D00A00E877A6 /* FilterView.swift in Sources */,
+				00C54AA127C1E5E900E877A6 /* EVDAltSpreadCell.swift in Sources */,
+				00C54A9D27C1E5E900E877A6 /* EventDetailTableCell.swift in Sources */,
+				00C54AC227C23B1E00E877A6 /* MagicSixPackCell.swift in Sources */,
+				00C54AA527C1E5E900E877A6 /* EventDetailsShowAllCell.swift in Sources */,
+				00C54A8927C1E5C900E877A6 /* EVDLiftingHeaderVC.swift in Sources */,
+				00C54A9127C1E5DA00E877A6 /* EventDetailsViewController.swift in Sources */,
 				62F44688251E277D000A68A0 /* AppDelegate.swift in Sources */,
 				62F4468A251E277D000A68A0 /* SceneDelegate.swift in Sources */,
 				89B4BF4D27570BFD003D426B /* HeaderVC.swift in Sources */,
+				00C54AAB27C1E64000E877A6 /* EVDLiftingHeaderVM.swift in Sources */,
+				00C54AB027C2078B00E877A6 /* UISixPackButton.swift in Sources */,
+				00C54AAC27C1E64000E877A6 /* EventDetailsViewModel.swift in Sources */,
+				00C54AAE27C2006500E877A6 /* Extensions.swift in Sources */,
+				00C54AD027C2D08700E877A6 /* FilterDataCell.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -345,6 +513,38 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		00C54A7D27C1E4A900E877A6 /* XCRemoteSwiftPackageReference "WHSportsbook" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://oauth2:21wPE4b-sDL-vicBcf9e@gitlab.com/williamhillplc/usa/ios/WHSportsbook.git";
+			requirement = {
+				kind = exactVersion;
+				version = 1.0.19;
+			};
+		};
+		00C54A8027C1E4D700E877A6 /* XCRemoteSwiftPackageReference "WHNetwork" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://oauth2:21wPE4b-sDL-vicBcf9e@gitlab.com/williamhillplc/usa/ios/WHNetwork.git";
+			requirement = {
+				kind = exactVersion;
+				version = 1.0.34;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		00C54A7E27C1E4AA00E877A6 /* WHSportsbook */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 00C54A7D27C1E4A900E877A6 /* XCRemoteSwiftPackageReference "WHSportsbook" */;
+			productName = WHSportsbook;
+		};
+		00C54A8127C1E4D800E877A6 /* WHNetwork */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 00C54A8027C1E4D700E877A6 /* XCRemoteSwiftPackageReference "WHNetwork" */;
+			productName = WHNetwork;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 62F4467C251E277D000A68A0 /* Project object */;
 }

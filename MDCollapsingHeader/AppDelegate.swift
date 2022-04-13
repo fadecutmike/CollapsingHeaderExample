@@ -29,9 +29,3 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Use this method to release any resources that were specific to the discarded scenes, as they will not return.
     }
 }
-
-extension Numeric where Self == CGFloat {
-    var twoDecimalString : String { String(format: "%.2f", self) }
-    var shortStr         : String { String(format: "%.0f", self) }
-    func shortDigitStr(_ limit: Int) -> String { String(format: "%\(limit).f", self) }
-}

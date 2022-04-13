@@ -8,7 +8,7 @@
 import UIKit
 
 // MARK: - Containing ViewController
-class ContainingViewController: UIViewController, EVDHeaderDelegate {
+class ContainingViewController: UIViewController, HeaderDelegate {
     
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var liftingHeader: UIView!
@@ -63,9 +63,7 @@ extension ContainingViewController: UIScrollViewDelegate {
         
         if (scrollView.isTracking || scrollView.isDragging || scrollView.isDecelerating) {
             let headerHeight: CGFloat = currentHeaderHeight
-            
-            print("\t\t\t scrollViewDidScroll A - scrollV.offset: \(scrollView.contentOffset.y.shortStr),\t liftHeaderOrig: \(liftingHeaderOriginY.shortStr),\t tableV.origin: \(tableView.frame.origin.y.shortStr),\t headerH: \(headerHeight.shortStr),\t lastScrollOffClean: \(lastScrollOffsetClean.shortStr),\t scrollRev: \(lastScrollReverseOffset?.shortStr ?? "nil")")
-            
+                        
             // Normalized scroll offset.y value accounting for headerHeight and returning only positive offset values
             let cleanOffsetY: CGFloat = scrollView.contentOffset.y + headerHeight
             let alreadyCollapsed = lastScrollOffsetClean < cleanOffsetY && headerHeight == minOperatingHeight
@@ -93,8 +91,6 @@ extension ContainingViewController: UIScrollViewDelegate {
             let maxLimit = ((tableView.frame.origin.y - maxOperatingHeight) + minOperatingHeight)
             let minLimit = min(tableView.frame.origin.y, ((tableView.frame.origin.y - max(0.0, maxOperatingHeight + scrollView.contentOffset.y)) + (lastScrollReverseOffset ?? 0.0)))
             liftingHeaderOriginY = max(maxLimit, minLimit)
-            
-            print("\t\t\t scrollViewDidScroll B - scrollV.offset: \(scrollView.contentOffset.y.shortStr),\t liftHeaderOrig: \(liftingHeaderOriginY.shortStr),\t tableV.origin: \(tableView.frame.origin.y.shortStr),\t headerH: \(headerHeight.shortStr),\t lastScrollOffClean: \(lastScrollOffsetClean.shortStr),\t scrollRev: \(lastScrollReverseOffset?.shortStr ?? "nil")")
         }
     }
         
@@ -109,14 +105,9 @@ extension ContainingViewController: UIScrollViewDelegate {
             UIView.animate(withDuration: 0.35) { [self] in
                 let newHeaderOrigin = (willExpand ? 0.0 : minOperatingHeight - maxOperatingHeight) + tableView.frame.origin.y
                 let headerOriginDiff = liftingHeaderOriginY-newHeaderOrigin
-
-                print("\n\n\t\t\t expandLiftHeader A - scrollV.offset: \(tableView.contentOffset.y.shortStr),\t liftHeaderOrig: \(liftingHeaderOriginY.shortStr),\t tableV.origin: \(tableView.frame.origin.y.shortStr),\t headerOriginDiff: \(headerOriginDiff.shortStr),\t headerH: \(currentHeaderHeight.shortStr),\t lastScrollOffClean: \(lastScrollOffsetClean.shortStr),\t scrollRev: \(lastScrollReverseOffset?.shortStr ?? "nil")")
-                
                 liftingHeaderOriginY = newHeaderOrigin
                 tableView.contentOffset.y += headerOriginDiff
                 lastScrollOffsetClean = tableView.contentOffset.y + currentHeaderHeight
-                
-                print("\t\t\t expandLiftHeader B - scrollV.offset: \(tableView.contentOffset.y.shortStr),\t liftHeaderOrig: \(liftingHeaderOriginY.shortStr),\t tableV.origin: \(tableView.frame.origin.y.shortStr),\t headerOriginDiff: \(headerOriginDiff.shortStr),\t headerH: \(currentHeaderHeight.shortStr),\t lastScrollOffClean: \(lastScrollOffsetClean.shortStr),\t scrollRev: \(lastScrollReverseOffset?.shortStr ?? "nil")\n\n")
             }
         }
     }

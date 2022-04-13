@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="19455" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina6_1" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="19454"/>
+        <capability name="Named colors" minToolsVersion="9.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <customFonts key="customFonts">
+        <array key="Proxima Nova Condensed Semibold.otf">
+            <string>ProximaNovaCond-Semibold</string>
+        </array>
+    </customFonts>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" id="gTV-IL-0wX" customClass="FilterDataCell" customModule="WH_CZR_SBK" customModuleProvider="target">
+            <rect key="frame" x="0.0" y="0.0" width="83" height="32"/>
+            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+            <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
+                <rect key="frame" x="0.0" y="0.0" width="83" height="32"/>
+                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                <subviews>
+                    <view contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" translatesAutoresizingMaskIntoConstraints="NO" id="vEM-rJ-dai" userLabel="ContentView">
+                        <rect key="frame" x="0.0" y="0.0" width="83" height="32"/>
+                        <subviews>
+                            <view contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" translatesAutoresizingMaskIntoConstraints="NO" id="EBi-J8-iVu" userLabel="Filter Container">
+                                <rect key="frame" x="1" y="0.0" width="81" height="32"/>
+                                <subviews>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" verticalCompressionResistancePriority="755" insetsLayoutMarginsFromSafeArea="NO" text="Label" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="cgc-ok-Nzp" userLabel="filter title label" customClass="PaddingLabel" customModule="WH_CZR_SBK" customModuleProvider="target">
+                                        <rect key="frame" x="0.0" y="0.0" width="81" height="32"/>
+                                        <fontDescription key="fontDescription" name="ProximaNovaCond-Semibold" family="Proxima Nova Condensed" pointSize="16"/>
+                                        <color key="textColor" name="WH_Black"/>
+                                        <nil key="highlightedColor"/>
+                                        <userDefinedRuntimeAttributes>
+                                            <userDefinedRuntimeAttribute type="number" keyPath="leftInset">
+                                                <real key="value" value="12"/>
+                                            </userDefinedRuntimeAttribute>
+                                            <userDefinedRuntimeAttribute type="number" keyPath="rightInset">
+                                                <real key="value" value="12"/>
+                                            </userDefinedRuntimeAttribute>
+                                            <userDefinedRuntimeAttribute type="number" keyPath="topInset">
+                                                <real key="value" value="6"/>
+                                            </userDefinedRuntimeAttribute>
+                                            <userDefinedRuntimeAttribute type="number" keyPath="bottomInset">
+                                                <real key="value" value="6"/>
+                                            </userDefinedRuntimeAttribute>
+                                        </userDefinedRuntimeAttributes>
+                                    </label>
+                                </subviews>
+                                <constraints>
+                                    <constraint firstAttribute="bottom" secondItem="cgc-ok-Nzp" secondAttribute="bottom" id="FRe-rG-tT9"/>
+                                    <constraint firstItem="cgc-ok-Nzp" firstAttribute="top" secondItem="EBi-J8-iVu" secondAttribute="top" id="L0g-cq-8pE"/>
+                                    <constraint firstItem="cgc-ok-Nzp" firstAttribute="leading" secondItem="EBi-J8-iVu" secondAttribute="leading" id="xj6-RY-tQJ"/>
+                                    <constraint firstAttribute="trailing" secondItem="cgc-ok-Nzp" secondAttribute="trailing" id="zhU-DB-rsp"/>
+                                </constraints>
+                            </view>
+                        </subviews>
+                        <constraints>
+                            <constraint firstAttribute="trailing" secondItem="EBi-J8-iVu" secondAttribute="trailing" constant="1" id="9KM-SF-QNa"/>
+                            <constraint firstAttribute="bottom" secondItem="EBi-J8-iVu" secondAttribute="bottom" id="QuD-jd-M6J"/>
+                            <constraint firstItem="EBi-J8-iVu" firstAttribute="leading" secondItem="vEM-rJ-dai" secondAttribute="leading" constant="1" id="Upd-S7-70g"/>
+                            <constraint firstItem="EBi-J8-iVu" firstAttribute="top" secondItem="vEM-rJ-dai" secondAttribute="top" id="ccO-yW-mo9"/>
+                        </constraints>
+                    </view>
+                </subviews>
+            </view>
+            <constraints>
+                <constraint firstAttribute="bottom" secondItem="vEM-rJ-dai" secondAttribute="bottom" id="6Zs-DC-ZgQ"/>
+                <constraint firstItem="vEM-rJ-dai" firstAttribute="top" secondItem="gTV-IL-0wX" secondAttribute="top" id="A1G-MJ-Qw4"/>
+                <constraint firstItem="vEM-rJ-dai" firstAttribute="leading" secondItem="gTV-IL-0wX" secondAttribute="leading" id="Ubv-ob-q6U"/>
+                <constraint firstAttribute="trailing" secondItem="vEM-rJ-dai" secondAttribute="trailing" id="ghP-iH-8jb"/>
+            </constraints>
+            <size key="customSize" width="83" height="32"/>
+            <connections>
+                <outlet property="filterDataLabel" destination="cgc-ok-Nzp" id="f6u-Qx-u93"/>
+                <outletCollection property="czkElements" destination="EBi-J8-iVu" collectionClass="NSMutableArray" id="c8s-2y-gVL"/>
+                <outletCollection property="czkElements" destination="cgc-ok-Nzp" collectionClass="NSMutableArray" id="9gb-UZ-EcX"/>
+            </connections>
+            <point key="canvasLocation" x="-141.30434782608697" y="118.52678571428571"/>
+        </collectionViewCell>
+    </objects>
+    <designables>
+        <designable name="cgc-ok-Nzp">
+            <size key="intrinsicContentSize" width="57.5" height="31.5"/>
+        </designable>
+    </designables>
+    <resources>
+        <namedColor name="WH_Black">
+            <color red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
+    </resources>
+</document>

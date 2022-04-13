@@ -7,13 +7,13 @@
 
 import UIKit
 
-protocol EVDHeaderDelegate: AnyObject {
+protocol HeaderDelegate: AnyObject {
     func btnPressed()
 }
 
 class HeaderVC: UIViewController {
     
-    weak var delegate: EVDHeaderDelegate?
+    weak var delegate: HeaderDelegate?
     @IBOutlet var sbButton: UIButton!
     
     override func viewDidLoad() {
