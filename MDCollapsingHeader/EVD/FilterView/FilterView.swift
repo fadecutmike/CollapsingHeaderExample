@@ -9,11 +9,13 @@
 import UIKit
 
 private var filterLayout: UICollectionViewFlowLayout {
-    let layout               = UICollectionViewFlowLayout()
-    layout.scrollDirection   = .horizontal
-    layout.estimatedItemSize = .init(width: 60.0, height: 34.0)
-    layout.itemSize          = UICollectionViewFlowLayout.automaticSize
-    layout.sectionInset      = .init(top: 0.0, left: 15.0, bottom: 0.0, right: 15.0)
+    let layout                  = UICollectionViewFlowLayout()
+    layout.scrollDirection      = .horizontal
+    layout.estimatedItemSize    = .init(width: 80.0, height: 50.0)
+    layout.sectionInset         = .init(top: 11.0, left: 16.0, bottom: 11.0, right: 16.0)
+    layout.minimumLineSpacing   = 8.0
+    layout.minimumInteritemSpacing = 8.0
+    
     return layout
 }
 
@@ -22,6 +24,7 @@ private var filterLayout: UICollectionViewFlowLayout {
 class FilterViewBase: UIView {
     public private(set) var filterColView: UICollectionView = .init(frame: .zero, collectionViewLayout: filterLayout)
     var filterOptionsCount: Int { 0 }
+    var cellType: WHCell { .filterViewCell }
     
     override func awakeFromNib() {
         super.awakeFromNib()
@@ -35,10 +38,10 @@ class FilterViewBase: UIView {
     func initialSetup() {}
     
     private func setupCollectionView() {
-        filterColView.register(.init(nibName: "FilterDataCell", bundle: nil), forCellWithReuseIdentifier: "FilterDataCell")
+        filterColView.registerWHCell(cellType)
         filterColView.delegate                       = self
         filterColView.dataSource                     = self
-        filterColView.backgroundColor                = .white
+        filterColView.backgroundColor                = .czkColor(.bg)
         filterColView.showsVerticalScrollIndicator   = false
         filterColView.showsHorizontalScrollIndicator = false
 
@@ -59,16 +62,13 @@ extension FilterViewBase: UICollectionViewDataSource, UICollectionViewDelegate, 
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int { filterOptionsCount }
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath)  -> UICollectionViewCell {
         let row  = indexPath.row
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "FilterDataCell", for: indexPath)
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: cellType.reuseId, for: indexPath)
         cell.tag = row+100
         
-        if let singleCell = cell as? FilterDataCell, let singleFilter = self as? FilterView {
-            singleCell.displayData(
-                title: singleFilter.filterOptions[row].title,
-                isSelected: singleFilter.currentIndexSelected == row,
-                itemIndexPath: indexPath,
-                numberOfItems: filterOptionsCount
-            )
+        if let multiFilter = self as? FilterViewMultiSelect, let multiCell = cell as? FilterDataCellMultiSelect {
+            multiCell.configMultiCell(multiFilter.multiFilterOptions[row])
+        } else if let singleCell = cell as? FilterDataCell, let fView = self as? FilterView {
+            singleCell.displayData(fView.filterOptions[row].title, fView.currentIndexSelected == row, indexPath, filterOptionsCount, fView.customAccessibilitySuffix)
         }
         
         return cell
@@ -76,22 +76,15 @@ extension FilterViewBase: UICollectionViewDataSource, UICollectionViewDelegate, 
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         if let singleSelectFilter = self as? FilterView {
-            collectionView.visibleCells.forEach({ $0.isSelected = $0.tag == indexPath.row+100 })
             singleSelectFilter.setSelectedIndex(indexPath.row)
+        } else if let multiSelectFilter = self as? FilterViewMultiSelect {
+            multiSelectFilter.cellTapped(indexPath.row)
         }
     }
-}
 
-protocol FilterOption: CustomStringConvertible { var title: String { get } }
-protocol FilterViewDelegate: AnyObject { func didSelectItem(_ index: Int) }
-
-// MARK: - Single Select Filter Option
-
-/// Filter option for standard FilterView supporting only single selection.
-struct SingleSelectFilter: FilterOption {
-    var title: String
-    var description: String { title }
-    init(_ text: String) { self.title = text }
+    func collectionView(_ collectionView: UICollectionView, didDeselectItemAt indexPath: IndexPath) {
+        if let multiSelectFilter = self as? FilterViewMultiSelect { multiSelectFilter.cellTapped(indexPath.row) }
+    }
 }
 
 // MARK: - Single-Select FilterView
@@ -102,27 +95,45 @@ class FilterView: FilterViewBase {
     weak var filterDelegate               : FilterViewDelegate?
     override var filterOptionsCount       : Int { filterOptions.count }
     private(set) var filterOptions        : [FilterOption] = []
-    private(set) var currentIndexSelected : Int = -1 {
-        willSet {
-            guard newValue != currentIndexSelected else { return }
-            filterDelegate?.didSelectItem(newValue)
-        }
+    private(set) var currentIndexSelected : Int = -1
+    
+    var customAccessibilitySuffix: String? {
+        didSet { DispatchQueue.main.async { self.filterColView.reloadData() } }
     }
     
     func clearFilterOptions() { filterOptions.removeAll() }
 
     func setSelectedIndex(_ index: Int) {
-        filterColView.setSelectedFilterIndex(index)
         currentIndexSelected = index
-    }
-    
-    func addData(_ newData: [SingleSelectFilter], _ defaultFilterIndex: Int? = nil) {
-
-        if filterOptions.map({$0.title}).joined() != newData.map({$0.title}).joined() { filterOptions = newData }
-        if let defIdx = defaultFilterIndex {
-            DispatchQueue.main.asyncAfter(deadline: .now()+0.15) { self.setSelectedIndex(defIdx) }
+        var cellRect: CGRect?
+        
+        if let cells = filterColView.visibleCells as? [FilterDataCell] {
+            for cell in cells {
+                if cell.position?.row == currentIndexSelected {
+                    cell.setSelectedState(true)
+                    cellRect = cell.frame
+                } else if cell.filterOptionIsSelected {
+                    cell.setSelectedState(false)
+                }
+            }
         }
         
-        filterColView.reloadData()
+        // Checks if filter option cell is fully onscreen, if not (cut off on left or right) then the collectionView will automatically scroll to bring the cell fully on screen
+        if let cRect = cellRect, let scrollRect = filterColView.horizFullyOnScreenXOffset(cRect) {
+            UIView.animate(withDuration: 0.2) {
+                self.filterColView.scrollRectToVisible(scrollRect, animated: true)
+            } completion: { _ in
+                self.filterDelegate?.didSelectItem(index)
+            }
+        } else {
+            self.filterDelegate?.didSelectItem(index)
+        }
+    }
+
+    func addData(_ newData: [SingleSelectFilter], _ defaultFilterIndex: Int? = nil) {
+        if filterOptions.map({$0.title}).joined() != newData.map({$0.title}).joined() { filterOptions = newData }
+        if let defIdx = defaultFilterIndex { currentIndexSelected = defIdx }
+        
+        DispatchQueue.main.async { self.filterColView.reloadData() }
     }
 }

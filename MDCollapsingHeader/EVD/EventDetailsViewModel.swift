@@ -51,14 +51,16 @@ enum LiftingHeaderState: Equatable {
     }
 }
 
-class EventDetailsViewModel {
-    
+typealias TeamNamesData = (teamOne: WHSportsbook.TeamData, teamTwo: WHSportsbook.TeamData)
+
+class EventDetailsViewModel: NSObject {
     // MARK: - EVD ViewModel Base Parameters
     
     weak var delegate  : EventDetailsDelegate?
     var eventDetails   : WHSportsbook.Event?
     var eventId        : String = ""
     var navBarLiveIcon : UIImage = .init(named: "evdNavBarLiveIcon")!
+    var allRelatedEventIds: [String] = []
     
     // MARK: - EVD LiftingHeader
     
@@ -85,12 +87,16 @@ class EventDetailsViewModel {
     
     // MARK: - EVD TableView and Data Parameters
 
-    var evdTabsData   : [EVDTabData] = []
-    var teamDataGroup : (team1: WHSportsbook.TeamData, team2: WHSportsbook.TeamData)?
+    var teamDataGroup       : TeamNamesData?
+    var adjustedSectionData : [String : EVDSectionData] = [:]
+    var evdTabsData         : [EVDTabData] = []
     
     private(set) var selectedMktColIndex: Int = 0
     
     func setSelectedMktCollectionIndex(_ idx: Int) {
+        adjustedSectionData.removeAll()
+        clearCollapsedSections()
+        clearSectionsShowingAllRows()
         selectedMktColIndex = idx < evdTabsData.count ? idx : max(0, evdTabsData.count-1)
     }
     
@@ -120,14 +126,15 @@ class EventDetailsViewModel {
     init(_ eventId: String, _ delegate: EventDetailsDelegate?) {
         self.eventId  = eventId
         self.delegate = delegate
+        super.init()
         if eventId.count > 10, delegate != nil {
             print("\n\n\t\t evd eventId: \(eventId)\n\n")
         }
     }
-}
-
-extension WHSportsbook.Market {
-    var isAlternativeMarket: Bool { movingLines != nil }
+        
+    func shouldHideSpinner(_ delay: Double = 0.0) {
+        //
+    }
 }
 
 extension EventDetailsViewModel {
@@ -136,14 +143,12 @@ extension EventDetailsViewModel {
         minOperatingHeight = newState.minHeight
         maxOperatingHeight = newState.maxHeight
         
-        if let vc = delegate as? EventDetailsViewController {
-            vc.updateLiftingHeaderNoAnimation()
-        }
+        if let vc = delegate as? EventDetailsViewController { vc.updateLiftingHeaderNoAnimation() }
     }
     
-    var navBarAttributedTitle: NSAttributedString {
+    var evdNavAttrTitle: NSAttributedString {
         guard let ev = eventDetails else { return .init(string: "EVD event not loaded...") }
-            
+
         if ev.started, let liveEventData = ev.liveEventData, liveEventData.scores.count > 0 {
             guard let homeTeam = ev.homeTeam, let awayTeam = ev.awayTeam else { return .init(string: "home/away teams failed") }
             
@@ -154,7 +159,7 @@ extension EventDetailsViewModel {
             
             return result
         } else {
-            return WHAttr.getEVDNavTitleCustomFont(ev.eventName.replacePipes(), .white, .bold(16.0))
+            return WHAttr.getCustomStr(text: ev.eventName.rp.uppercased(), .czkColor(.foreground), WHFont.Refrigerator.extraBold(18.0).font)
         }
     }
     
@@ -175,7 +180,7 @@ extension EventDetailsViewModel {
             topLineTxt = gTimeString
         }
         
-        return WHAttr.getEVDNavTitle("\(topLineTxt)\n", .red, false)
+        return WHAttr.getEVDNavTitle("\(topLineTxt)\n", .czkColor(.live), false)
     }
     
     /// Generates attributed string for team names and scores for either left or right team for navBar attributed title
@@ -184,17 +189,22 @@ extension EventDetailsViewModel {
     ///   - liveScoreData: Event livescore data
     ///   - isLeftTeam: Whether to create string for left or right side of navBar title
     /// - Returns: NSAttributedString
-    private func navBarLiveTeamTitle(_ team: WHSportsbook.Selection, _ liveScoreData: WHSportsbook.LiveEventData, _ isLeftTeam: Bool) -> NSAttributedString {
-        let teamName = team.teamData?.teamShortName ?? team.name.replacePipes()
+    private func navBarLiveTeamTitle(_ team: WHSportsbook.Selection, _ liveScoreData: WHSportsbook.LiveEventData?, _ isLeftTeam: Bool) -> NSAttributedString {
+        let teamName = team.teamData?.teamShortName ?? team.name.rp
         
-        var scoreStr = " 0 "
-        if liveScoreData.scores.count > 1 {
-            let idx = isLeftTeam.flipped.intValue
-            scoreStr = " \(liveScoreData.scores[idx].points) "              // Attempt to load live score data if it exists.
-        }
+//        var scoreStr = " 0 "
+//        if let liveScoreData = liveScoreData, liveScoreData.scores.count > 1 {
+//            if ConfigurationManager.instance.getFeatureFlag(.livescores) == false {
+//                scoreStr = ""
+//            }
+//            else {
+//                let idx = isLeftTeam.flipped.intValue
+//                scoreStr = " \(liveScoreData.scores[idx].points) "              // Attempt to load live score data if it exists.
+//            }
+//        }
         
         let namePart = WHAttr.getEVDNavTitle(teamName)                      // Create team short name
-        let scorePart = WHAttr.getEVDNavTitle(scoreStr, .red)   // Create colorized team livescore
+        let scorePart = WHAttr.getEVDNavTitle(" 0 ", .czkColor(.live))   // Create colorized team livescore
         
         let result = isLeftTeam ? namePart : scorePart                      // Begin with name for left side team, otherwise begin with livescore
         result.append(isLeftTeam ? scorePart : namePart)
@@ -202,9 +212,6 @@ extension EventDetailsViewModel {
         return result
     }
 }
-
-/// Debug parameter that will load local json data if true one time on the first open of an EVD page
-var loadDebugEventFromLocalJSON = false
 
 // MARK: - Networking functions
 
@@ -219,21 +226,21 @@ extension EventDetailsViewModel: WHJsonRequestable {
     }
     
     /// Required, EventDetails must make an API call to get the full event data.
-    func loadEventDetails() {
+    func loadEventDetails(_ handler: (() -> ())? = nil) {
         WHDataManager().decodeJsonDataFrom(url: WHAPI.eventDetails(eventId).url, objectType: WHSportsbook.Event.self) { [weak self] (jsonObject, error) in
             guard let model = jsonObject, model.markets.count > 0 else {
                 if let err = error { print("eventDetailData request failed... error: \(err)\n") }
                 return
             }
-            
-            self?.eventFinishedLoad(model)
+
+            self?.eventFinishedLoad(model, handler)
         }
     }
     
     /// DEBUG ONLY!
     func loadLocalJSONEvent() {
         DispatchQueue.main.asyncAfter(deadline: .now()+1.0) { loadDebugEventFromLocalJSON = false }
-        guard let filepath = Bundle.main.path(forResource: "sliderMarketsEvent2", ofType: "json") else { return }
+        guard let filepath = Bundle.main.path(forResource: debugJSONFile.rawValue, ofType: "json") else { return }
 
         do {
             let data = try Data(contentsOf: URL(fileURLWithPath: filepath), options: .mappedIfSafe)
@@ -246,153 +253,146 @@ extension EventDetailsViewModel: WHJsonRequestable {
         }
     }
     
-    private func constructEVDSectionData(_ allMetadataGroupedMarkets: WHSportsbook.Markets, _ marketDisplayType: String) -> [EVDSectionData] {
-        let allCategorySpecificGroupedMarkets = allMetadataGroupedMarkets.filter({$0.metadata?.marketDisplayType == marketDisplayType })
-        let uniqueGroupCategories = allCategorySpecificGroupedMarkets.compactMap({$0.metadata?.marketCategory}).unique().map({String($0)})
+    private func constructEVDSectionData(_ metadataMkts: WHSportsbook.Markets, _ tabTitle: String) -> [EVDSectionData] {
+        
+        let categoryNameOrder = metadataMkts.compactMap({$0.metadata?.marketCategory})
+        var orderedMktCategoryNames: [String] = []
+        for mktCat in categoryNameOrder {
+            if !orderedMktCategoryNames.contains(mktCat) { orderedMktCategoryNames.append(mktCat) }
+        }
         
         var result: [EVDSectionData] = []
-        for groupCategory in uniqueGroupCategories {
-            let markets = allMetadataGroupedMarkets.filter({ $0.metadata?.marketCategory == groupCategory })
+        for mktCategory in orderedMktCategoryNames {
+            let markets = metadataMkts.filter({ $0.metadata?.marketCategory == mktCategory })
             guard let marketOne = markets.first, let metaData = marketOne.metadata else { fatalError() }
             
-            let colName = (metaData.marketCategoryName ?? marketOne.name ?? "mktNameErr").replacePipes()
-            let singleMkt : [EVDRowData] = marketOne.selections.map({ .init(titleText: $0.name.replacePipes(), metadata: metaData, market: marketOne, selections: [$0]) })
-            let multiMkt  : [EVDRowData] = markets.compactMap({ .init(titleText: ($0.metadata?.player ?? $0.name ?? colName).replacePipes(), metadata: $0.metadata, market: $0, selections: $0.selections) })
+            let colName = (metaData.marketCategoryName ?? marketOne.name ?? marketOne.displayName ?? "mktNameErr").rp
+            var resultMkts : [EVDRowData] = marketOne.selections.map({ .init($0.name.rp, metaData, marketOne, [$0]) })
+            if markets.count > 1 { resultMkts = markets.compactMap({ .init(($0.metadata?.player ?? $0.name ?? colName).rp, $0.metadata, $0, $0.selections) }) }
             
-            let mktCatTitle = metaData.marketCategoryName ?? metaData.marketCategory?.replacingOccurrences(of: "_", with: " ").capExcludingNumbers
-            var sectionTitle = (mktCatTitle ?? marketOne.name ?? marketOne.selections.first?.name ?? "err").replacePipes()
-            sectionTitle.magicSixPackTrimSectionHeaderTitle()
-            
-            let newSection: EVDSectionData = .init(sectionHeaderTitle: sectionTitle, evdRows: markets.count == 1 ? singleMkt : multiMkt)
-            result.append(newSection)
-        }
-        
-        return result
-    }
-    
-    private func eventFinishedLoad(_ ev: WHSportsbook.Event) {
-        
-        DispatchQueue.main.async { [self] in
-            eventDetails = ev
-            let rootMarketCollections = (ev.marketCollectionsFromV3MarketTabs() ?? []).filter({$0.markets.compactMap({$0.selections}).count > 0})
-    
-            var result: [EVDTabData] = []
-            for mktCol in rootMarketCollections {
-                var groupEVDSections: [EVDSectionData] = []
-                let allMetadataGroupedMarkets = mktCol.markets.filter({$0.metadata?.useMetadataGroups ?? false})
-                let groupedSectionData = EVDMarketGroupType.caseStrs.map({constructEVDSectionData(allMetadataGroupedMarkets, $0)}).flatCmpt
-                groupEVDSections.append(contentsOf: groupedSectionData)
-                
-                let allNonMetadataGroupedMarkets = mktCol.markets.filter({!($0.metadata?.useMetadataGroups ?? false)})
-                groupEVDSections.append(contentsOf: EVDSectionData.nonGroupedMarkets(allNonMetadataGroupedMarkets))
-                
-                result.append(.init(filterTabTitle: mktCol.name, evdSections: groupEVDSections))
+            // Logic to populate parameters that are used to enable filtering for tabs grouped cells
+            if (metaData.marketDisplayType ?? "err") == "tabs" {
+                if resultMkts.count > 0 { for (idx, mkt) in resultMkts.enumerated() { resultMkts[idx].tabFilterText = mkt.metadata?.teamName ?? mkt.titleText } }
             }
             
-            evdTabsData = result
+            let mktCatTitle = metaData.marketCategoryName ?? metaData.marketCategory?.replacingOccurrences(of: "_", with: " ").capExcludingNumbers
+            var sectionTitle = (mktCatTitle ?? marketOne.name ?? marketOne.displayName ?? marketOne.selections.first?.name ?? "err").rp
+            sectionTitle.magicSixPackTrimSectionHeaderTitle()
             
-            headerVC?.filterView?.addData(evdTabsData.compactMap({ $0.filterTabTitle }).map({ SingleSelectFilter($0) }) )
-            headerVC?.filterView?.setSelectedIndex(selectedMktColIndex)
-            headerVC?.setupEVDHeader(ev)
-            
-            
-            updateLiftingHeader(.preGame)
-            delegate?.eventDetailLoaded()
-            
-            let teamDataArray = ev.markets.map({$0.selections.compactMap({$0.teamData}) }).flatCmpt.unique().map({$0})
-            if teamDataArray.count > 1 { teamDataGroup = (teamDataArray[0], teamDataArray[1]) }
+            result.append(.init(sectionTitle, resultMkts, tabTitle))
         }
-    }
-}
-
-enum EVDMarketGroupType: String, CaseIterable, Equatable {
-    case sixPack = "alternativeSixPack", slider, tabs
-    
-    static var caseStrs: [String] { allCases.map({$0.rawValue}) }
-}
-
-struct EVDTabData {
-    let filterTabTitle : String
-    let evdSections    : [EVDSectionData]
-    var numSections    : Int { evdSections.count }
-}
-
-struct EVDSectionData {
-    let sectionHeaderTitle : String
-    let evdRows            : [EVDRowData]
-    var markets            : WHSportsbook.Markets { evdRows.map({ $0.market })}
-    var rootMetadata       : WHSportsbook.Metadata? { evdRows.first?.metadata }
-    var groupType          : EVDMarketGroupType? { evdRows.first?.groupType }
         
-    static func nonGroupedMarkets(_ mkts: WHSportsbook.Markets) -> [EVDSectionData] {
-        var result: [EVDSectionData] = []
-        for mkt in mkts {
-            let singleMkt : [EVDRowData] = mkt.selections.map({ .init(titleText: $0.name.replacePipes(), metadata: nil, market: mkt, selections: [$0]) })
-            let newSection: EVDSectionData = .init(sectionHeaderTitle: (mkt.name ?? mkt.selections.first?.name ?? "").replacePipes(), evdRows: singleMkt)
-            result.append(newSection)
-        }
         return result
     }
-}
+    
+    private func eventFinishedLoad(_ ev: WHSportsbook.Event, _ handler: (() -> ())? = nil) {
+        
+        eventDetails = ev
+        allRelatedEventIds = [ev.id]
 
-struct EVDRowData {
-    let titleText  : String
-    let metadata   : WHSportsbook.Metadata?
-    let market     : WHSportsbook.Market
-    let selections : WHSportsbook.Selections
-    var groupType  : EVDMarketGroupType? { .init(rawValue: metadata?.marketDisplayType ?? "err") }
+        let marketTabs = ev.marketTabs ?? []
+        var result: [EVDTabData] = []
+        
+        for mktTab in marketTabs {
+            let markets = mktTab.marketIds.unique().compactMap({ tabMktId in ev.markets.first(where: {$0.id == tabMktId}) })
+            var groupEVDSections: [EVDSectionData] = []
+            var mktsAdded: [String] = []
+            
+            let popularSixPack = markets.filter({ $0.sixPackView ?? false })
+            if popularSixPack.count > 0 {
+                groupEVDSections.append(.popularSixPack(popularSixPack, mktTab.name))
+                mktsAdded.append(contentsOf: popularSixPack.compactMap({$0.id}))
+            }
+            
+            let metadataMarkets = markets.filter({ !mktsAdded.contains($0.id) && ($0.metadata?.useMetadataGroups ?? false) })
+            if metadataMarkets.count > 0 {
+                groupEVDSections.append(contentsOf: constructEVDSectionData(metadataMarkets, mktTab.name))
+                mktsAdded.append(contentsOf: metadataMarkets.compactMap({$0.id}))
+            }
+            
+            let nonMetadataMkts = markets.filter({ !mktsAdded.contains($0.id) })
+            if nonMetadataMkts.count > 0 {
+                groupEVDSections.append(contentsOf: EVDSectionData.nonGroupedMarkets(nonMetadataMkts, mktTab.name))
+            }
+            
+            result.append(.init(filterTabTitle: mktTab.name, evdSections: groupEVDSections))
+        }
+        
+        evdTabsData = result
+        let tabTitles = result.compactMap({ $0.filterTabTitle }).map({ SingleSelectFilter($0) })
+        if selectedMktColIndex >= tabTitles.count { setSelectedMktCollectionIndex(tabTitles.count-1) }
+        
+        DispatchQueue.main.async { [weak self] in
+            
+            self?.headerVC?.filterView?.clearFilterOptions()
+            self?.headerVC?.filterView?.addData(tabTitles)
+            self?.headerVC?.filterView?.setSelectedIndex(self?.selectedMktColIndex ?? 0)
+            self?.headerVC?.setupEVDHeader(ev)
+            
+            if !ev.started {
+                self?.updateLiftingHeader(.preGame)
+            }
+            
+//            WHDiffusionManager.shared.subscribeTopics(topics)
+            self?.delegate?.eventDetailLoaded()
+            handler?()
+        }
+        
+        let teamDataArray = ev.markets.map({$0.selections.compactMap({$0.teamData}) }).flatCmpt.unique().map({$0})
+        if teamDataArray.count > 1 { teamDataGroup = (teamDataArray[0], teamDataArray[1]) }
+    }
 }
 
 // MARK: - Data helpers and diffusion code
 
 extension EventDetailsViewModel {
     
+    func numberSections() -> Int {
+        if eventDetails?.display == false { return 0 }
+        return getEVDTabData()?.evdSections.count ?? 0
+    }
+    
     func numberRows(_ section: Int) -> Int {
-        if collapsedSections.contains(section) { return 0 }
-        guard selectedMktColIndex < evdTabsData.count, section < evdTabsData[selectedMktColIndex].evdSections.count else { fatalError("EVDVM, invalid numRows for \(section)") }
+        if eventDetails?.display == false { return 0 }
+        guard let evdSectionData = getEVDSectionData(section) else { return 0 }
+        if collapsedSections.contains(section) { return 1 } // Section is collapsed, only return header cell
         
-        if evdTabsData[selectedMktColIndex].filterTabTitle == "Popular" { return 0 }
+        let dataRowsCount = numberOfEvdDataRows(evdSectionData)
+        let nonDataHeaderOrTopRowCount = numberOfNonDataHeaderRows(evdSectionData, section)
+        var result = dataRowsCount + nonDataHeaderOrTopRowCount
         
-        let evdSectionData = evdTabsData[selectedMktColIndex].evdSections[section]
-        let rowCount = evdSectionData.evdRows.count
-        
-        var result = 0
-        
-        if let groupType = evdSectionData.groupType, groupType == .sixPack { return 1 }
-                
-        if rowCount == 4 { result = rowCount } // Do not add 'View more/less' row to count
-        if rowCount < 4  { return 1 }        // For 3 or less selections, only return one prefab row containing the selections
-        
-        if rowCount == 4, let groupType = evdSectionData.groupType, groupType == .tabs { return 4 + 1 }
-        
-        result = sectionsShowingAllRows.contains(section) ? rowCount : 4 + 1
-        if let groupType = evdSectionData.groupType, groupType == .tabs { return result+1 }
+        if dataRowsCount > 4 {
+            let allRowsIncludingHeadersAndFooters = dataRowsCount + nonDataHeaderOrTopRowCount + 1       // Add 1 for the 'show more' footer cell
+            let limitedRowsShowMoreState = nonDataHeaderOrTopRowCount + 4 + 1 // Add 1 for the 'show less' footer cell
+            result = sectionsShowingAllRows.contains(section) ? allRowsIncludingHeadersAndFooters : limitedRowsShowMoreState
+        }
         
         return result
     }
     
-    func numberSections() -> Int {
-        guard selectedMktColIndex < evdTabsData.count else { return 0 }
+    func numberOfNonDataHeaderRows(_ evdSectionData: EVDSectionData, _ section: Int = 1) -> Int {
+        var result = 1 // Default EVD collapsible section header cell
+        if evdSectionData.groupType == .tabs { result += 1 } // Tab buttons cell
+        if section == 0 && evdSectionData.parentTabTitle == "Popular" && evdSectionData.groupType == .sixPack { result -= 1 } // Removes a row for Popular tab sixPacks
         
-        if evdTabsData[selectedMktColIndex].filterTabTitle == "Popular" { return 1 }
-        
-        return evdTabsData[selectedMktColIndex].evdSections.count
+        return result
     }
     
+    func numberOfEvdDataRows(_ sectData: EVDSectionData) -> Int { [.slider, .sixPack].contains(sectData.groupType) ? 1 : sectData.evdRows.count }
+    
+    private func adjustedSectionKey(_ section: Int) -> String { "\(selectedMktColIndex),\(section)" }
+    
     func getEVDSectionData(_ section: Int) -> EVDSectionData? {
-        guard selectedMktColIndex < evdTabsData.count, section < evdTabsData[selectedMktColIndex].evdSections.count else { return nil }
-        return evdTabsData[selectedMktColIndex].evdSections[section]
+        guard let tabsData = getEVDTabData(), section < tabsData.evdSections.count else { return nil }
+        return adjustedSectionData[adjustedSectionKey(section)] ?? tabsData.evdSections[section]
     }
     
     func getEVDTabData() -> EVDTabData? {
-        guard selectedMktColIndex < evdTabsData.count else { return nil }
+        guard evdTabsData.count > 0 && selectedMktColIndex < evdTabsData.count else { return nil }
         return evdTabsData[selectedMktColIndex]
     }
 }
 
-class WHSlider: UISlider {
-    override func awakeFromNib() {
-        super.awakeFromNib()
-        setThumbImage(UIImage(named: "sliderThumb"), for: .normal)
-    }
-}
+/// Debug parameter that will load local json data if true one time on the first open of an EVD page
+var loadDebugEventFromLocalJSON = false
+let debugJSONFile: EVDDebugJSONFile = .tabsA

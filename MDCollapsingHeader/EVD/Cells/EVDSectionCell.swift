@@ -17,7 +17,7 @@ class EVDSectionCell: UITableViewCell {
     
     override func awakeFromNib() {
         super.awakeFromNib()
-        titleLabel.proximaBold(size: 18.0)
+        titleLabel.setFontProxima(.bold(18.0))
     }
     
     override func prepareForReuse() {

@@ -24,6 +24,15 @@ class EventDetailsViewController: UIViewController, EVDShowAllDelegate {
     /// A helper parameter which calculates the effictive current height of the LiftingHeader
     var currentHeaderHeight: CGFloat { (liftingHeaderOriginY + viewModel.maxOperatingHeight) - (tableView?.frame.origin.y ?? 0.0) }
     
+    let bottomCoverView  = UIView()
+    lazy var titleLabel: UILabel = {
+        let label = UILabel()
+        label.numberOfLines = 2
+        label.textAlignment = .center
+        label.widthAnchor.constraint(lessThanOrEqualToConstant: 200).isActive = true
+        return label
+    }()
+    
     /// Value which directly sets the origin.y parameter on the LiftingHeader
     lazy var liftingHeaderOriginY: CGFloat = (tableView?.frame.origin.y ?? 0.0) {
         didSet { liftingHeader?.frame.origin.y = liftingHeaderOriginY }
@@ -32,8 +41,7 @@ class EventDetailsViewController: UIViewController, EVDShowAllDelegate {
     // MARK: - init
     override func viewDidLoad() {
         super.viewDidLoad()
-//        navBarTitle = ""
-//        navBarAttributedTitle = nil
+        configureNavBar()
         configureTableView()
         filterView?.filterDelegate = self
         
@@ -42,12 +50,13 @@ class EventDetailsViewController: UIViewController, EVDShowAllDelegate {
         }
     }
         
-    class func newEVDVC(_ eventId: String) -> EventDetailsViewController {
-        let evd: WHVC = .eventDetails
-        guard eventId.count > 10, let vc = evd.board.instantiateViewController(withIdentifier: evd.vcId) as? EventDetailsViewController else { fatalError("Make new EVD VC failed! evId: \(eventId)") }
-        vc.viewModel = EventDetailsViewModel(eventId, vc)
-        return vc
-    }
+//    class func newEVDVC(_ eventId: String) -> EventDetailsViewController {
+////        let evd: WHVC = .eventDetails
+////        guard eventId.count > 10, let vc = evd.board.instantiateViewController(withIdentifier: evd.vcId) as? EventDetailsViewController else { fatalError("Make new EVD VC failed! evId: \(eventId)") }
+//        let vc = EventDetailsViewController
+//        vc.viewModel = EventDetailsViewModel(eventId, vc)
+//        return vc
+//    }
     
     required init?(coder: NSCoder) {
         viewModel = .init("", nil)
@@ -61,35 +70,115 @@ class EventDetailsViewController: UIViewController, EVDShowAllDelegate {
             viewModel.headerVC = vc
         }
     }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        navigationController?.navigationBar.backgroundColor = .czkColor(.bg)
+        bottomCoverView.isHidden = false
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        bottomCoverView.isHidden = true
+    }
+    
+//    override func customCZKLogic() {
+//        guard let newLiveIconImg = viewModel.navBarLiveIcon.tinted(.czkColor(.foreground)) else { fatalError() }
+//        viewModel.navBarLiveIcon = newLiveIconImg
+//        tableView?.reloadData()
+//    }
 
+    private func configureNavBar() {
+        guard let navigationBar = navigationController?.navigationBar else { return }
+
+        let statusBarCover = UIView(frame: CGRect(x: 0, y: -60, width: UIScreen.main.bounds.width, height: 60))
+        statusBarCover.backgroundColor = UIColor.czkColor(.bg)
+        navigationBar.addSubview(statusBarCover)
+        
+        bottomCoverView.backgroundColor = .czkColor(.bg)
+        bottomCoverView.translatesAutoresizingMaskIntoConstraints = false
+        navigationBar.addSubview(bottomCoverView)
+        bottomCoverView.leftAnchor.constraint(equalTo: navigationBar.leftAnchor).isActive = true
+        bottomCoverView.rightAnchor.constraint(equalTo: navigationBar.rightAnchor).isActive = true
+        bottomCoverView.topAnchor.constraint(equalTo: navigationBar.bottomAnchor).isActive = true
+        bottomCoverView.heightAnchor.constraint(equalToConstant: 10).isActive = true
+    }
+    
+    private lazy var footerHeightUpdateDebounce = Debouncer<()>(delay: 0.2) { [self] _ in
+        guard let tableView = tableView else { return }
+                
+        let tableContentHeight = (tableView.contentSize.height + tableView.contentInset.top) - (tableView.tableFooterView?.frame.size.height ?? 0.0)
+        let requiredHeight = tableView.frame.height + (viewModel.maxOperatingHeight - viewModel.minOperatingHeight)
+        
+        let newHeight = tableContentHeight < requiredHeight ? max(0.0, requiredHeight - tableContentHeight) : 0.0
+        tableView.beginUpdates()
+        if (tableView.tableFooterView?.frame.size.height ?? 0.0) != newHeight { tableView.tableFooterView?.frame.size.height = newHeight }
+        tableView.endUpdates()
+    }
+    
+    /// Method that dynamically updates the UITableViewFooterView height to allow for scrolling with bounce/inertia even if there isn't enough content in the table to allow for scrolling.
+    /// This allows the user to still expand or collapse a live scoreboard or pre-game on all tabs/screens in EVD even if it only contains one market.
+    private func processFooterHeight() {
+        footerHeightUpdateDebounce.call(())
+    }
+    
     private func configureTableView() {
-        tableView?.registerWHCells([.evdSelectionCell, .evdMarketTemplateCell, .evdShowAllCell, .evdSectionCell, .evdAltSpreadCell, .evdTabsGroupingCell, .sixPackTableCell])
+        tableView?.delegate   = self
+        tableView?.dataSource = self
+        tableView?.registerWHCells([.evdSelectionCell, .evdShowAllCell, .evdSectionCell, .evdAltSpreadCell, .evdTabsGroupingCell, .mspSixPackTableCell, .evdCompactCell])
+        tableView?.backgroundColor = .clear
+        
         tableView?.rowHeight = UITableView.automaticDimension
         tableView?.estimatedRowHeight = UITableView.automaticDimension
-        tableView?.delegate = self
-        tableView?.dataSource = self
         
-        tableView?.setupRefreshControl { self.viewModel.loadEventDetails() } // Temporarily disable refresh control
+        let footer = UIView(frame: CGRect(x: 0.0, y: 0.0, width: view.frame.width, height: 0.0))
+        tableView?.tableFooterView = footer
+        
+//        tableView?.setupCustomEVDRefreshControl({ [weak self] in
+//            self?.viewModel.loadEventDetails {
+//                self?.tableView?.finishAndResetRefreshControl(-(self?.viewModel.minOperatingHeight ?? -100.0))
+//            }
+//        })
     }
 
     // MARK: - EventDetailMarketCellBuilderDelegate methods
     
     @objc func didTapHeader(_ sender: UITapGestureRecognizer) {
         guard let section = sender.view?.tag, section >= 0 else { fatalError("invalid header section tapped EVD...") }
-        let savedContentOff = tableView?.contentOffset
+        if !viewModel.collapsedSections.contains(section), viewModel.numberSections() < 8 {
+            tableView?.tableFooterView?.frame.size.height += 600.0
+            tableView?.contentOffset.y = -currentHeaderHeight
+        }
         viewModel.updateCollapsedSection(section)
         tableView?.reloadSections([section], with: .automatic)
-        if let off = savedContentOff { tableView?.setContentOffset(off, animated: false) }
-        updateBottomInsetSpacing()
+        processFooterHeight()
     }
 
     func didTapFooter(_ section: Int) {
         guard section >= 0 else { fatalError("invalid footer section tapped EVD...") }
-        let savedContentOff = tableView?.contentOffset
-        viewModel.updateShowingAllRowsSection(section)
-        tableView?.reloadSections([section], with: .automatic)
-        if let off = savedContentOff { tableView?.setContentOffset(off, animated: false) }
-        updateBottomInsetSpacing()
+        
+        if viewModel.sectionsShowingAllRows.contains(section), let tv = tableView {
+            
+            let tableContentHeight = (tv.contentSize.height + tv.contentInset.top) - (tv.tableFooterView?.frame.size.height ?? 0.0)
+            let requiredHeight = tv.frame.height + (viewModel.maxOperatingHeight - viewModel.minOperatingHeight)
+            if tableContentHeight < requiredHeight || section == 0 {
+                // Not enough tableView rows to fill screen or too close to top of tableView. Only scroll to minOperatingHeight
+                tv.setContentOffset(.init(x: 0.0, y: -viewModel.minOperatingHeight), animated: true)
+            } else {
+                // 'Show Less' pressed, collapsing/removing rows
+                tv.scrollToRow(at: .init(row: 0, section: section), at: .none, animated: true)
+            }
+            
+            DispatchQueue.main.asyncAfter(deadline: .now()+0.25) { [self] in
+                viewModel.updateShowingAllRowsSection(section)
+                tableView?.reloadSections([section], with: .automatic)
+            }
+        } else {
+            // 'Show More' pressed, expanding/adding rows
+            viewModel.updateShowingAllRowsSection(section)
+            tableView?.reloadSections([section], with: .automatic)
+        }
+        processFooterHeight()
     }
 }
 
@@ -101,124 +190,162 @@ extension EventDetailsViewController: EventDetailsDelegate {
         if tableView?.refreshControl?.isRefreshing ?? false {
             UIView.animate(withDuration: 0.35) { self.tableView?.refreshControl?.endRefreshing() }
         }
-        updateNavBarAttributedTitle(viewModel.navBarAttributedTitle)
+        titleLabel.attributedText = viewModel.evdNavAttrTitle
+        navigationItem.titleView = titleLabel
     }
     
     // Todo: Implement
     func applyLiveScoreUpdate() {
-        updateNavBarAttributedTitle(viewModel.navBarAttributedTitle)
+        titleLabel.attributedText = viewModel.evdNavAttrTitle
+        navigationItem.titleView = titleLabel
+    }
+    
+    func checkStatus() {
+        guard let tableView = self.tableView else { return }
+        if viewModel.eventDetails?.display == false && tableView.backgroundView == nil {
+            // make background view with message
+            let margin: CGFloat = 20.0
+            let labelFrame = CGRect(x: margin, y: 0.0, width: tableView.frame.width - margin*2, height: tableView.frame.height)
+            let label = UILabel(frame: labelFrame)
+            label.text = "Sorry, it looks like this event is no longer available."
+            label.numberOfLines = 0
+            label.textAlignment = .center
+            label.font = WHFont.Proxima.regular(28.0).font
+            tableView.backgroundView = label
+            self.liftingHeader?.isHidden = true
+            tableView.reloadData()
+        }
+        else if tableView.backgroundView != nil {
+            tableView.backgroundView = nil
+            self.liftingHeader?.isHidden = false
+            tableView.reloadData()
+        }
     }
 
     var tableViewRef: UITableView? { tableView }
 }
 
+private var totalCurrentRowsForSection: [Int: Int] = [:]
+
 extension EventDetailsViewController: UITableViewDataSource, UITableViewDelegate {
 
-    func numberOfSections(in tableView: UITableView)                             -> Int { viewModel.numberSections() }
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int { viewModel.numberRows(section) + 1 }
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath)  -> UITableViewCell {
+    func numberOfSections(in tableView: UITableView) -> Int { viewModel.numberSections() }
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        let result = viewModel.numberRows(section)
+        totalCurrentRowsForSection[section] = result
+        return result
+    }
+    
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let section : Int = indexPath.section
-        var row     : Int = indexPath.row
+        let row     : Int = indexPath.row
         
-        guard let tabData = viewModel.getEVDTabData(), let evdSection = viewModel.getEVDSectionData(section) else { fatalError() }
+        guard let ev = viewModel.eventDetails, let tabData = viewModel.getEVDTabData(), let evdSection = viewModel.getEVDSectionData(section) else { return .init() }
         let isExpanded = !viewModel.collapsedSections.contains(section)
+        let groupType = evdSection.groupType ?? .unGrouped
         
-        if tabData.filterTabTitle == "Popular", section == 0, row == 0, let ev = viewModel.eventDetails,
-           let cell = tableView.dequeueReusableCell(withIdentifier: "MSPTableViewCell", for: indexPath) as? MSPTableViewCell {
-            cell.configureMagicSixPackCell(ev)
-            cell.mainTitleLabel.text = "Popular Bets"
-            if cell.topSpaceConstraint.constant != 28.0 { cell.topSpaceConstraint.constant = 28.0 }
-            cell.removeEVDTapGesture()
-            cell.delegate = self
-            return cell
-        } else if row == 0, let cell = tableView.dequeueReusableCell(withIdentifier: "MSPTableViewCell", for: indexPath) as? EVDSectionCell {
-            cell.titleLabel.text = evdSection.sectionHeaderTitle
-            cell.contentView.tag = section
-            let tapGesture = UITapGestureRecognizer(target: self, action: #selector(didTapHeader(_:)))
-            cell.contentView.addGestureRecognizer(tapGesture)
-            cell.arrowIcon.transform = CGAffineTransform.init(rotationAngle: isExpanded ? -.pi/2.0 : .pi/2.0)
-            
-            if evdSection.groupType == .sixPack {
-                cell.updateBottomSpacingForSixPack(isExpanded)
-            } else {
-                cell.updateBottomSpacing(isExpanded)
+        if row == 0 {
+            if groupType == .sixPack, tabData.filterTabTitle == "Popular", section == 0,
+               let cell = tableView.dequeueReusableCell(withIdentifier: WHCell.mspSixPackTableCell.reuseId, for: indexPath) as? MSPTableViewCell {
+                
+                cell.configureMagicSixPackCell(ev, .textOnly, evdSection.popularSixPackMarkets)
+                cell.mainTitleLabel.text = "Popular Bets"
+                if cell.topSpaceConstraint.constant != 26.0 { cell.topSpaceConstraint.constant = 26.0 }
+                cell.removeEVDTapGesture()
+                cell.delegate = self
+                return cell
             }
             
-            if let mktTab = (viewModel.eventDetails?.marketTabs ?? []).first(where: {$0.name == "Same Game Parlay"}), let mkId = evdSection.markets.first?.id {
-                if mktTab.marketIds.contains(mkId) { cell.sgpIcon.isHidden = false }
+            if let cell = tableView.dequeueReusableCell(withIdentifier: WHCell.evdSectionCell.reuseId, for: indexPath) as? EVDSectionCell {
+                cell.contentView.tag = section
+                let tapGesture = UITapGestureRecognizer(target: self, action: #selector(didTapHeader(_:)))
+                cell.contentView.addGestureRecognizer(tapGesture)
+                cell.updateBottomSpacing(isExpanded, groupType)
+                var showSGPBadge = false
+                
+                if groupType == .sixPack {
+                    showSGPBadge = ev.byoEligible ?? false
+                } else if let mktTab = (viewModel.eventDetails?.marketTabs ?? []).first(where: {$0.name == "Same Game Parlay"}), let mkId = evdSection.markets.first?.id {
+                    showSGPBadge = mktTab.marketIds.contains(mkId)
+                }
+                
+                cell.setLabelAttributedText(WHAttr.getEVDSectionHeader(evdSection.sectionHeaderTitle, showSGPBadge))
+                return cell
             }
-            return cell
         }
         
-        if evdSection.groupType == .slider {
-            if let ev = viewModel.eventDetails, let homeTeam = ev.homeTeam, let awayTeam = ev.awayTeam, let market = evdSection.markets.first,
-                let cell = tableView.dequeueReusableCell(withIdentifier: "EVDAltSpreadCell", for: indexPath) as? EVDAltSpreadCell {
+        if row == 1 {
+            if groupType == .slider, let homeTeam = ev.homeTeam, let awayTeam = ev.awayTeam, let market = evdSection.markets.first,
+               let cell = tableView.dequeueReusableCell(withIdentifier: WHCell.evdAltSpreadCell.reuseId, for: indexPath) as? EVDAltSpreadCell {
                 cell.configSliderCell(market, homeTeam, awayTeam)
                 cell.lhsBtn?.addTarget(self, action: #selector(tappedBetslipButton(_:)), for: .touchUpInside)
                 cell.rhsBtn?.addTarget(self, action: #selector(tappedBetslipButton(_:)), for: .touchUpInside)
                 return cell
             }
-        } else if evdSection.groupType == .sixPack {
-            if let ev = viewModel.eventDetails, let cell = tableView.dequeueReusableCell(withIdentifier: "MSPTableViewCell", for: indexPath) as? MSPTableViewCell {
-                cell.configureMagicSixPackCell(ev, evdSection.markets)
-                cell.hideColumnsCheck()
-                cell.mainTitleLabel.text = ""
+            
+            if groupType == .sixPack, let cell = tableView.dequeueReusableCell(withIdentifier: WHCell.mspSixPackTableCell.reuseId, for: indexPath) as? MSPTableViewCell {
+                cell.configureMagicSixPackCell(ev, .allHidden, evdSection.markets)
                 cell.removeEVDTapGesture()
                 cell.trimMarketTitlesCategory()
                 cell.delegate = self
                 if cell.topSpaceConstraint.constant != 0.0 { cell.topSpaceConstraint.constant = 0.0 }
                 return cell
             }
-        } else if evdSection.groupType == .tabs, row == 1 {
-            if let cell = tableView.dequeueReusableCell(withIdentifier: "EVDTabsGroupingCell", for: indexPath) as? EVDTabsGroupingCell, let tabs = evdSection.rootMetadata?.tabs {
-                cell.tabButtons?[1].setTitle(tabs.first ?? "err", for: .normal)
-                cell.tabButtons?[2].setTitle(tabs.last ?? "err", for: .normal)
-                return cell
-            }
-        } else {
-            if evdSection.groupType == .tabs { row -= 1 }
-            let market = evdSection.markets[max(min(evdSection.markets.count-1, row-1), 0)]
-            let numRows = viewModel.numberRows(section)
-            let secIsShowAllRows: Bool = viewModel.sectionsShowingAllRows.contains(section)
             
-            if numRows > WHLookup.evdShowAllRowsLimit || secIsShowAllRows {
+            if groupType == .tabs, let cell = tableView.dequeueReusableCell(withIdentifier: WHCell.evdTabsGroupingCell.reuseId, for: indexPath) as? EVDTabsGroupingCell {
                 
-                let isShowLessCell: Bool = (row == numRows - (evdSection.groupType == .tabs ? 1 : 0)) && secIsShowAllRows
-                let isShowMoreCell: Bool = (row == WHLookup.evdShowAllRowsLimit + 1) && !secIsShowAllRows
-                
-                if (isShowLessCell || isShowMoreCell),
-                   let cell = tableView.dequeueReusableCell(withIdentifier: "EventDetailsShowAllCell", for: indexPath) as? EventDetailsShowAllCell {
-                    
-                    cell.section = section
-                    cell.delegate = self
-                    cell.showAllBtn.setTitle("Show \(isShowLessCell ? "less" : "more")", for: .normal)
-                    return cell
+                if let adjustedData = viewModel.adjustedSectionData["\(viewModel.selectedMktColIndex),\(section)"], viewModel.selectedMktColIndex < viewModel.evdTabsData.count {
+                    let evdSections = viewModel.evdTabsData[viewModel.selectedMktColIndex].evdSections
+                    guard section < evdSections.count else { fatalError() }
+                    cell.configDataAdjustController(viewModel.selectedMktColIndex, section, evdSections[section], adjustedData, self)
+                } else {
+                    cell.configDataAdjustController(viewModel.selectedMktColIndex, section, evdSection, nil, self)
                 }
-                
-                if let cell = tableView.dequeueReusableCell(withIdentifier: "EventDetailMarketSelectionCell") as? EventDetailMarketSelectionCell {
-                    cell.populate(event: viewModel.eventDetails, market: market, row: row - 1)
-                    cell.delegate = self
-                    return cell
-                }
-            }
-            
-            if let cell = tableView.dequeueReusableCell(withIdentifier: "EventDetailMarketSelectionCell") as? EventDetailMarketSelectionCell {
-                cell.populate(event: viewModel.eventDetails, market: market, row: row - 1, row == numRows-1)
-                cell.delegate = self
                 return cell
             }
         }
+        
+        let numOfDataRows = viewModel.numberOfEvdDataRows(evdSection)
+        let totalCurrentRows = viewModel.numberRows(section)
+        
+        if numOfDataRows > 4, row == totalCurrentRows-1 {
+            if let cell = tableView.dequeueReusableCell(withIdentifier: WHCell.evdShowAllCell.reuseId, for: indexPath) as? EventDetailsShowAllCell {
+                cell.section = section
+                cell.delegate = self
+                cell.showAllBtn.setTitle("Show \(viewModel.sectionsShowingAllRows.contains(section) ? "Less" : "\(numOfDataRows - 4) More")", for: .normal)
+                return cell
+            }
+        }
+        let rowDataIdx = min(evdSection.evdRows.count-1, row - viewModel.numberOfNonDataHeaderRows(evdSection))
+        let rowData = evdSection.evdRows[rowDataIdx]
+        
+        if rowData.cellType == .evdCompactCell, let cell = tableView.dequeueReusableCell(withIdentifier: WHCell.evdCompactCell.reuseId) as? EVDCompactMarketCell {
+            
+            cell.configCell(rowData)
+//            cell.packButtons?.forEach({ $0.addTarget(self, action: #selector(tappedBetslipButton(_:)), for: .touchUpInside) })
+            return cell
+        }
+        
+        if let cell = tableView.dequeueReusableCell(withIdentifier: WHCell.evdSelectionCell.reuseId) as? EventDetailMarketSelectionCell {
+            let customText = rowData.metadata?.player ?? rowData.selections.first?.name.rp
+            cell.populate(market: rowData.market, rowData.selections, groupType == .tabs ? customText : nil, viewModel.adjustedSectionData["\(viewModel.selectedMktColIndex),\(section)"], viewModel.teamDataGroup)
+            cell.spBtns.forEach({ $0.addTarget(self, action: #selector(tappedBetslipButton(_:)), for: .touchUpInside) })
+            cell.adjustBottomSpace(numOfDataRows <= 4 && row == totalCurrentRows-1)
+            cell.layoutIfNeeded()
+            
+            return cell
+        }
                 
-        return UITableViewCell()
+        fatalError("EVD failed to construct cell")
     }
     
     @objc func tappedBetslipButton(_ sender: UISixPackButton) {
-    
+        //
     }
     
-    func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+//    func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
 //        tableView.diffusionSubscribeCheck()
-    }
+//    }
 }
 
 // MARK: - Lifting Header Logic
@@ -272,14 +399,6 @@ extension EventDetailsViewController {
         }
     }
     
-    func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
-        // Fixes an issue with lifting header overlapping content when the table doesn't have enough rows to fill the screen
-        let tableContentHeight = scrollView.contentSize.height + scrollView.contentInset.top
-        let requiredHeight = scrollView.frame.height + (viewModel.maxOperatingHeight - viewModel.minOperatingHeight)
-        let result = max(0.0, requiredHeight - tableContentHeight)
-        if scrollView.contentInset.bottom > result { scrollView.contentInset.bottom = result }
-    }
-    
     func expandLiftingHeader(_ willExpand: Bool = true) {
         DispatchQueue.main.async { [self] in
             
@@ -290,7 +409,7 @@ extension EventDetailsViewController {
             let newHeaderOrigin = (willExpand ? 0.0 : minHeight - maxHeight) + tableView.frame.origin.y
             let headerOriginDiff = liftingHeaderOriginY-newHeaderOrigin
             UIView.animate(withDuration: 0.35) {
-                liftingHeaderOriginY = newHeaderOrigin
+                self.liftingHeaderOriginY = newHeaderOrigin
                 tableView.contentOffset.y += headerOriginDiff
             }
             viewModel.lastScrollOffsetClean = tableView.contentOffset.y + currentHeaderHeight
@@ -307,35 +426,10 @@ extension EventDetailsViewController {
                 liftingHeaderOriginY = tableView?.frame.origin.y ?? 97.0
                 tableView?.contentOffset.y = -maxH
                 tableView?.contentInset.top = maxH
-            } completion: { _ in
-                updateBottomInsetSpacing()
-                tableView?.beginUpdates()
-                tableView?.endUpdates()
+            } completion: { [self] _ in
+                tableView?.reloadData()
+                processFooterHeight()
             }
-        }
-    }
-    
-    private func updateBottomInsetSpacing() {
-        guard let tableView = tableView, tableView.contentSize.height > 40.0 else { return }
-        
-        let numSections = viewModel.numberSections()
-        let numRows = (0..<numSections).map({viewModel.numberRows($0)+1}).reduce(0,+)
-        
-        if numRows < 10 {
-            let tableContentHeight = tableView.contentSize.height + tableView.contentInset.top
-            let requiredHeight = tableView.frame.height + (viewModel.maxOperatingHeight - viewModel.minOperatingHeight)
-            let result = max(0.0, requiredHeight - tableContentHeight)
-            
-            if viewModel.lastScrollOffsetClean > 0 {
-                let insetDiff = result - tableView.contentInset.bottom
-                var newOffset = tableView.contentOffset
-                newOffset.y += insetDiff
-                tableView.setContentOffset(newOffset, animated: true)
-            }
-            
-            tableView.contentInset.bottom = result
-        } else {
-            tableView.contentInset.bottom = 0.0
         }
     }
 }
@@ -344,14 +438,39 @@ extension EventDetailsViewController {
 
 extension EventDetailsViewController: FilterViewDelegate {
     func didSelectItem(_ index: Int) {
-        viewModel.clearCollapsedSections()
-        viewModel.clearSectionsShowingAllRows()
-        viewModel.setSelectedMktCollectionIndex(index)
-        
-        DispatchQueue.main.async { [self] in
+        guard (tableView?.contentSize.height ?? 0.0) > 10.0 else {
+            // If tableView content is zero, avoid offset adjustment code
+            viewModel.setSelectedMktCollectionIndex(index)
             tableView?.reloadData()
-            updateBottomInsetSpacing()
+            processFooterHeight()
+            return
         }
+        
+        tableView?.tableFooterView?.frame.size.height += 600.0
+        tableView?.contentOffset.y = -currentHeaderHeight
+        UIView.animate(withDuration: 0.2, delay: 0.05, options: []) {
+            // Hack to perform tableView reloadData sometime after above contentOffset. DispatchQueue resulted in crashes
+        } completion: { [self] _ in
+            viewModel.setSelectedMktCollectionIndex(index)
+            tableView?.reloadData()
+            processFooterHeight()
+        }
+    }
+}
+
+// MARK: - DiffableVCOwner
+
+extension EventDetailsViewController: DiffableVCOwner {
+    var vmRef: DiffusionUpdatableVM? { viewModel }
+}
+
+// MARK: - EVD Data Adjust Delegate (tab cells etc.)
+
+extension EventDetailsViewController: EVDDataAdjustDelegate {
+    func evdDataWasAdjusted(_ dataKey: String, _ section: Int, _ adjustedData: EVDSectionData?) {
+        viewModel.adjustedSectionData[dataKey] = adjustedData
+        tableView?.reloadSections([section], with: .automatic)
+        processFooterHeight()
     }
 }
 

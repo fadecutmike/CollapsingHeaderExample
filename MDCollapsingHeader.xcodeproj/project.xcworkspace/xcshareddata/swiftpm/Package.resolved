@@ -1,25 +1,23 @@
 {
-  "object": {
-    "pins": [
-      {
-        "package": "WHNetwork",
-        "repositoryURL": "https://oauth2:21wPE4b-sDL-vicBcf9e@gitlab.com/williamhillplc/usa/ios/WHNetwork.git",
-        "state": {
-          "branch": null,
-          "revision": "bd134ff37af4c15fa6a182d839bef95bf0b1d80f",
-          "version": "1.0.34"
-        }
-      },
-      {
-        "package": "WHSportsbook",
-        "repositoryURL": "https://oauth2:21wPE4b-sDL-vicBcf9e@gitlab.com/williamhillplc/usa/ios/WHSportsbook.git",
-        "state": {
-          "branch": null,
-          "revision": "c6ce327fb40e78f7a3085d5f7d15da579bbfdfb2",
-          "version": "1.0.19"
-        }
+  "pins" : [
+    {
+      "identity" : "whnetwork",
+      "kind" : "remoteSourceControl",
+      "location" : "git@gitlab.com:caesarsdigital/usa/ios/WHNetwork.git",
+      "state" : {
+        "revision" : "a9171bf88060d2e3b049ffcf7b2f771c1d3f0be0",
+        "version" : "1.0.52"
       }
-    ]
-  },
-  "version": 1
+    },
+    {
+      "identity" : "whsportsbook",
+      "kind" : "remoteSourceControl",
+      "location" : "git@gitlab.com:caesarsdigital/usa/ios/WHSportsbook.git",
+      "state" : {
+        "revision" : "bf863c150d1b2dba346ae0a5ae508f706c5a7580",
+        "version" : "1.0.25"
+      }
+    }
+  ],
+  "version" : 2
 }

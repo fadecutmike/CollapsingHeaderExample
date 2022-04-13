@@ -1,39 +1,47 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="19529" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="20037" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="retina6_1" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="19519"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="20020"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
         <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
-        <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" rowHeight="58" id="hFK-92-GTT" customClass="EventDetailsShowAllCell" customModule="MDCollapsingHeader" customModuleProvider="target">
-            <rect key="frame" x="0.0" y="0.0" width="414" height="58"/>
-            <autoresizingMask key="autoresizingMask"/>
+        <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" id="hFK-92-GTT" customClass="EventDetailsShowAllCell" customModule="MDCollapsingHeader" customModuleProvider="target">
+            <rect key="frame" x="0.0" y="0.0" width="414" height="56"/>
+            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
             <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="hFK-92-GTT" id="XOz-hV-AO8">
-                <rect key="frame" x="0.0" y="0.0" width="414" height="58"/>
+                <rect key="frame" x="0.0" y="0.0" width="414" height="56"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
-                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="FHe-ge-IeN">
-                        <rect key="frame" x="154.5" y="14" width="105.5" height="18"/>
+                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="1F6-2f-edc" userLabel="Spacer Height Bar">
+                        <rect key="frame" x="406" y="0.0" width="8" height="56"/>
+                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
-                            <constraint firstAttribute="height" constant="18" id="4hy-1S-HUQ"/>
+                            <constraint firstAttribute="width" constant="8" id="Vvz-EJ-xQw"/>
+                            <constraint firstAttribute="height" constant="56" id="bmj-fS-SlD"/>
                         </constraints>
-                        <state key="normal" title="Button"/>
-                        <buttonConfiguration key="configuration" style="plain" title="Show more" titleAlignment="center">
-                            <fontDescription key="titleFontDescription" name="ProximaNovaCond-Medium" family="Proxima Nova Condensed" pointSize="16"/>
-                        </buttonConfiguration>
+                    </view>
+                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="FHe-ge-IeN">
+                        <rect key="frame" x="161.5" y="8" width="91" height="26"/>
+                        <constraints>
+                            <constraint firstAttribute="height" constant="26" id="4hy-1S-HUQ"/>
+                        </constraints>
+                        <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                        <state key="normal" title="Show More"/>
                         <connections>
                             <action selector="showAllBtnTapped:" destination="hFK-92-GTT" eventType="touchUpInside" id="3cQ-U3-mIi"/>
                         </connections>
                     </button>
                 </subviews>
                 <constraints>
-                    <constraint firstAttribute="bottom" secondItem="FHe-ge-IeN" secondAttribute="bottom" constant="26" id="FNu-it-K8h"/>
+                    <constraint firstAttribute="bottom" secondItem="1F6-2f-edc" secondAttribute="bottom" id="8B4-Iu-3q9"/>
                     <constraint firstItem="FHe-ge-IeN" firstAttribute="centerX" secondItem="XOz-hV-AO8" secondAttribute="centerX" id="Mzy-my-zwF"/>
-                    <constraint firstItem="FHe-ge-IeN" firstAttribute="top" secondItem="XOz-hV-AO8" secondAttribute="top" constant="14" id="bPA-nB-MOA"/>
+                    <constraint firstItem="1F6-2f-edc" firstAttribute="top" secondItem="XOz-hV-AO8" secondAttribute="top" id="Sbq-cY-rYr"/>
+                    <constraint firstItem="FHe-ge-IeN" firstAttribute="top" secondItem="XOz-hV-AO8" secondAttribute="top" constant="8" id="bPA-nB-MOA"/>
+                    <constraint firstAttribute="trailing" secondItem="1F6-2f-edc" secondAttribute="trailing" id="lib-P1-Zvi"/>
                 </constraints>
             </tableViewCellContentView>
             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>

@@ -1,27 +1,15 @@
 //
 //  UISixPackButton.swift
-//  MDCollapsingHeader
+//  WH_CZR_SBK
 //
-//  Created by mad on 2/20/22.
+//  Created by Daniel Tepper on 10/7/20.
+//  Copyright © 2020 Caesar's Entertainment. All rights reserved.
 //
 
 import UIKit
 import WHSportsbook
 
-//protocol DiffusionSubscribable {
-//    var market: WHSportsbook.Market? { get set }
-//    var selection: WHSportsbook.Selection? { get set }
-//    func applyUpdates(_ mktUpdate: DiffusionMarketUpdate?, _ selUpdate: DiffusionSelectionUpdate?)
-//    func applyLiveScoreUpdate(_ livescoreUpdate: DiffusionLivescoreUpdate)
-//}
-//
-//extension Array where Element == DiffusionSubscribable {
-//    func topics(_ topicTypes: [WHDSubscribeType] = [.eventOnly, .marketOnly, .selectionOnly, .eventLivescore]) -> Set<WHDTopic> {
-//        WHDTopic.fromMarketsAndSelections(compactMap({$0.market}), compactMap({$0.selection}), topicTypes).returnAsSet()
-//    }
-//}
-
-class UISixPackButton: UIButton, CZPackDataOwner {
+class UISixPackButton: UIButton, CZPackDataOwner, HighlightableSelection {
     var market: WHSportsbook.Market? {
         didSet { oldMarket = oldValue == nil ? market : oldValue }
     }
@@ -40,14 +28,12 @@ class UISixPackButton: UIButton, CZPackDataOwner {
     var rhsLabel = UILabel()
     var borderLayer: UIView = .init()
     
-    var highlightIndicatorBar = UIView()
+    var highlightIndicatorBar: UIView! = .init()
     var packColors: (bg: CZK.ThemeColor, border: CZK.ThemeColor) = (.secondary, .primaryStroke)
     
     override func awakeFromNib() {
         super.awakeFromNib()
-        setTitle("", for: .normal)
-        layer.borderWidth = 0.0
-        layer.borderColor = nil
+        setTitle(nil, for: .normal)
     }
 
     private func setupLabel(_ label: UILabel) {
@@ -69,17 +55,15 @@ class UISixPackButton: UIButton, CZPackDataOwner {
     private func setupBorder() {
         if !subviews.contains(borderLayer) {
             borderLayer.isUserInteractionEnabled = false
-            borderLayer.backgroundColor   = .clear
-            borderLayer.layer.borderWidth = 1.0
-            borderLayer.layer.borderColor = UIColor.brown.cgColor
+            borderLayer.backgroundColor = .czkColor(packColors.bg)
             addSubview(borderLayer)
             
             borderLayer.translatesAutoresizingMaskIntoConstraints = false
             NSLayoutConstraint.activate([
-                borderLayer.widthAnchor.constraint(equalTo: widthAnchor, constant: -1.0),
-                borderLayer.heightAnchor.constraint(equalTo: heightAnchor, constant: -1.0),
-                borderLayer.centerXAnchor.constraint(equalTo: centerXAnchor),
-                borderLayer.centerYAnchor.constraint(equalTo: centerYAnchor)
+                borderLayer.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 1.0),
+                borderLayer.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -1.0),
+                borderLayer.topAnchor.constraint(equalTo: topAnchor, constant: 1.0),
+                borderLayer.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -1.0)
             ])
         }
     }
@@ -87,7 +71,10 @@ class UISixPackButton: UIButton, CZPackDataOwner {
     override func didMoveToSuperview() {
         super.didMoveToSuperview()
         if !subviews.contains(highlightIndicatorBar) {
-            highlightIndicatorBar.backgroundColor = .black
+            titleLabel?.numberOfLines = 2
+            titleLabel?.textAlignment = .center
+            
+            highlightIndicatorBar.backgroundColor = .czkColor(.selected)
             highlightIndicatorBar.alpha = 0.0
             highlightIndicatorBar.frame = CGRect(x: 0.0, y: 0.0, width: 8.0, height: frame.size.height - 2.0)
             highlightIndicatorBar.center = .init(x: highlightIndicatorBar.center.x, y: center.y)
@@ -99,16 +86,14 @@ class UISixPackButton: UIButton, CZPackDataOwner {
                 highlightIndicatorBar.widthAnchor.constraint(equalToConstant: 8.0),
                 highlightIndicatorBar.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -1.0)
             ])
-
+//            NotificationCenter.default.addObserver(self, selector: #selector(highlightDidChange(_:)), name: WHNotification.kHighlightedSelectionIdsChanged.name, object: nil)
         } else {
             bringSubviewToFront(highlightIndicatorBar)
         }
     }
     
-    func shouldHighlightIndicator(_ shouldShow: Bool) {
-        DispatchQueue.main.async {
-            UIView.animate(withDuration: 0.25) { self.highlightIndicatorBar.alpha = shouldShow ? 1.0 : 0.0 }
-        }
+    @objc func highlightDidChange(_ notification: Notification) {
+//        if let selId = selection?.id { shouldHighlightIndicator(WHLookup.highlightedSelectionIds.contains(selId)) }
     }
     
     func configBtn(_ pType: CZPackButtonData, _ mkt: WHSportsbook.Market, _ sel: WHSportsbook.Selection, _ packContext: CZPackDataContext? = nil) {
@@ -138,7 +123,9 @@ class UISixPackButton: UIButton, CZPackDataOwner {
         
         isAccessibilityElement = true
         let selectionId = selection?.id == nil ? "" : "/\(selection?.id ?? "selId Err..")"
-        accessibilityValue = "\(market?.eventId ?? "evId Err..")/\(market?.id ?? "mktId Err..")\(selectionId)"
+        let selectorStr = "\(market?.eventId ?? "evId Err..")/\(market?.id ?? "mktId Err..")\(selectionId)"
+        accessibilityValue = selectorStr
+        accessibilityIdentifier = selectorStr
         accessibilityTraits = [.button]
     }
 
@@ -146,7 +133,7 @@ class UISixPackButton: UIButton, CZPackDataOwner {
         if let mktUpdate = marketUpdate, let newVal = mktUpdate.line {
             market?.updateMarket(mktUpdate)
             if let oldVal = oldMarket?.line, oldVal != newVal {
-                DispatchQueue.main.async { self.updateButtonBg(newVal>oldVal ? .black : .black) }
+                DispatchQueue.main.async { self.updateButtonBg(newVal>oldVal ? .czkColor(.successState) : .czkColor(.errState)) }
             }
         }
 
@@ -154,7 +141,7 @@ class UISixPackButton: UIButton, CZPackDataOwner {
             let newVal = selUpdate.price.a
             selection?.updateSelection(selUpdate)
             if let oldVal = oldSelection?.price?.a, oldVal != newVal {
-                DispatchQueue.main.async { self.updateButtonBg(newVal>oldVal ? .black : .black) }
+                DispatchQueue.main.async { self.updateButtonBg(newVal>oldVal ? .czkColor(.successState) : .czkColor(.errState)) }
             }
         }
 
@@ -172,33 +159,38 @@ class UISixPackButton: UIButton, CZPackDataOwner {
     }
     
     private func updateAttributedLabelText(_ attrStringsResult: [(NSAttributedString, CZLayoutZone)]?) {
+        var dataValue = "Data: "
         if let attrStringsResult = attrStringsResult {
+            
             for result in attrStringsResult {
                 if !(selection?.active ?? true) || !(market?.active ?? true) {
                     lhsLabel.attributedText = nil
                     rhsLabel.attributedText = nil
                     setAttributedTitle(WHAttr.getPackAttrString(text: "🔐", font: .systemFont(ofSize: 10.0), color: .green), for: .normal)
+                    dataValue += "Locked"
                 } else {
                     switch result.1 {
                         case .leading: lhsLabel.attributedText  = result.0
                         case .centered: setAttributedTitle(result.0, for: .normal)
                         case .trailing: rhsLabel.attributedText = result.0
                     }
+                    dataValue += result.0.string
                 }
             }
         }
     
         let selectionId = selection?.id == nil ? "" : "/\(selection?.id ?? "selId Err..")"
+        accessibilityLabel = (accessibilityLabel?.components(separatedBy: "Data:")[0] ?? "") + dataValue.components(separatedBy: .newlines).joined(separator: "/")
         accessibilityValue = "\(market?.eventId ?? "evId Err..")/\(market?.id ?? "mktId Err..")\(selectionId)"
     }
 
     func applyStyling() {
         setupBorder()
-        titleLabel?.numberOfLines = 2
-        titleLabel?.textAlignment = .center
-        backgroundColor = .black
-        borderLayer.layer.borderColor = UIColor.brown.cgColor
+        backgroundColor = .czkColor(packColors.border)
+        borderLayer.backgroundColor   = .czkColor(packColors.bg)
         bringSubviewToFront(highlightIndicatorBar)
+        sendSubviewToBack(borderLayer)
+        layoutIfNeeded()
     }
 }
 
@@ -207,7 +199,7 @@ extension UISixPackButton {
     func updateButtonBg(_ color: UIColor) {
         DispatchQueue.main.async {
             self.animateBgColorChange(color, 0.0) { _ in
-                self.animateBgColorChange(.black, 0.2)
+                self.animateBgColorChange(.czkColor(self.packColors.border), 0.2)
             }
         }
     }
@@ -219,6 +211,24 @@ extension UISixPackButton {
             }, completion: completed)
         }
     }
+    
+    var allAttrTextJoined: String {
+        [lhsLabel.attributedText?.string, attributedTitle(for: .normal)?.string, rhsLabel.attributedText?.string].compactMap({$0}).joined(separator: ", ")
+    }
+    
+    func prepBtnForReuse() {
+        self.market    = nil
+        self.selection = nil
+        
+        self.titleLabel?.attributedText  = nil
+        self.lhsLabel.attributedText     = nil
+        self.rhsLabel.attributedText     = nil
+        self.highlightIndicatorBar.alpha = 0.0
+        self.isHidden = false
+
+        self.packDataContext = nil
+        self.packType        = nil
+    }
 }
 
 extension Array where Element == UISixPackButton {
@@ -228,18 +238,17 @@ extension Array where Element == UISixPackButton {
     }
 
     var visMarkets: WHSportsbook.Markets { visibleOnly.compactMap({ $0.market }) }
-    
-    func prepareButtonsForReuse() {
-        forEach({ btn in
-            btn.market    = nil
-            btn.selection = nil
-            btn.highlightIndicatorBar.alpha = 0.0
-            btn.titleLabel?.attributedText  = WHAttr.getTitle("")
-            btn.lhsLabel.attributedText = WHAttr.getTitle("")
-            btn.rhsLabel.attributedText = WHAttr.getTitle("")
-            btn.packType = nil
-            btn.packDataContext = nil
-        })
-    }
 }
 
+protocol HighlightableSelection {
+    var highlightIndicatorBar: UIView! { get set }
+    func shouldHighlightIndicator(_ shouldShow: Bool)
+}
+
+extension HighlightableSelection {
+    func shouldHighlightIndicator(_ shouldShow: Bool) {
+        DispatchQueue.main.async {
+            UIView.animate(withDuration: 0.25) { self.highlightIndicatorBar.alpha = shouldShow ? 1.0 : 0.0 }
+        }
+    }
+}

@@ -178,10 +178,3 @@ extension EVDLiftingHeaderVC: EVDLiftingHeaderVMDelegate {
         }
     }
 }
-
-public struct EventDetailsLiveScoreboard: Codable {
-    let eventId     : String
-    let launch_link : String
-    let height      : Int
-    let sport       : String
-}
